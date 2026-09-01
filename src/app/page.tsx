@@ -1,9 +1,17 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 
 // Figma wireframe: "① 홈" (01_Home)
 // DB reads: profiles.destination/trip_date (countdown banner),
 // learning_sessions (streak dots, computed from consecutive session_date rows)
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/signup");
+
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-between px-5 pt-6">
       <div className="flex flex-1 flex-col items-center gap-5">

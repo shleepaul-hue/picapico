@@ -1,7 +1,17 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import SocialLoginButtons from "@/components/SocialLoginButtons";
+
 // Figma wireframe: "⓪-1 가입" (00_SignUp)
-// DB: on successful OAuth, Supabase creates a row in auth.users;
-// we then upsert public.profiles (see supabase/schema.sql) on first login.
-export default function SignUpPage() {
+// DB: on successful OAuth, the on_auth_user_created trigger (supabase/schema.sql)
+// creates the matching public.profiles row automatically.
+export default async function SignUpPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) redirect("/");
+
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-between px-6 py-16">
       <div className="flex flex-col items-center gap-5">
@@ -19,14 +29,7 @@ export default function SignUpPage() {
       </div>
 
       <div className="flex w-full flex-col gap-3">
-        {/* TODO: wire up supabase.auth.signInWithOAuth({ provider: "google" }) */}
-        <button className="flex items-center justify-center gap-2 rounded-2xl border border-neutral-300 bg-white py-4 font-bold">
-          Google로 계속하기
-        </button>
-        {/* TODO: wire up supabase.auth.signInWithOAuth({ provider: "apple" }) */}
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-neutral-900 py-4 font-bold text-white">
-          Apple로 계속하기
-        </button>
+        <SocialLoginButtons />
 
         <div className="flex items-center gap-2 py-1 text-xs text-neutral-500">
           <span className="h-px flex-1 bg-neutral-300" />
