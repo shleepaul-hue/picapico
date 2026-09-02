@@ -28,27 +28,29 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
+type Status = "idle" | "listening" | "ready" | "scored" | "error";
+
 type Props = {
   target: string;
-  // Fired once the user has either gotten a result or explicitly skipped —
-  // the parent uses this to unlock the "퀴즈로" button.
+  // Fired once the user has either finished an attempt or explicitly
+  // skipped — the parent uses this to unlock the "퀴즈로" button.
   onAttempt: () => void;
 };
 
-// Rough pronunciation feedback: record via the browser's speech recognition,
-// compare the transcript to the target phrase word-by-word. This is an
-// approximation (Web Speech API doesn't expose real phonetic scoring) —
-// framed as "참고용" in the copy so it isn't mistaken for the real thing.
-// Not supported on iOS Safari in most versions — a "건너뛰기" link keeps
-// the flow moving there.
+// One combined "따라 말해보기 → 채점하기" flow: recording IS the speech
+// recognition pass (Web Speech API), so there's a single mic action instead
+// of a separate waveform recorder + a separate scoring button. The score is
+// an approximation (Web Speech API doesn't expose real phonetic scoring) —
+// framed as "참고용" so it isn't mistaken for the real thing. Not supported
+// on iOS Safari in most versions — "건너뛰기" keeps the flow moving there.
 export default function PronunciationCheck({ target, onAttempt }: Props) {
-  const [status, setStatus] = useState<"idle" | "listening" | "done" | "error">("idle");
+  const [status, setStatus] = useState<Status>("idle");
   const [heard, setHeard] = useState<string | null>(null);
   const [result, setResult] = useState<PronunciationResult | null>(null);
 
   const supported = getSpeechRecognitionCtor() !== null;
 
-  const handleStart = () => {
+  const handleRecord = () => {
     const Ctor = getSpeechRecognitionCtor();
     if (!Ctor) return;
 
@@ -61,7 +63,7 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
       const transcript = event.results[0]?.[0]?.transcript ?? "";
       setHeard(transcript);
       setResult(scorePronunciation(target, transcript));
-      setStatus("done");
+      setStatus("ready");
       onAttempt();
     };
     recognition.onerror = () => setStatus("error");
@@ -72,14 +74,16 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
   };
 
   const handleSkip = () => {
-    setStatus("done");
+    setStatus("scored");
     onAttempt();
   };
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl bg-neutral-50 p-3.5">
+    <div className="flex flex-col gap-3 rounded-xl bg-neutral-50 p-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-neutral-600">발음 정확도 확인 (참고용)</span>
+        <p className="text-xs font-medium text-neutral-500">
+          소리 내어 따라 말해보세요 (참고용 채점)
+        </p>
         <button
           type="button"
           onClick={handleSkip}
@@ -89,28 +93,47 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
         </button>
       </div>
 
-      {supported ? (
-        <button
-          type="button"
-          onClick={handleStart}
-          disabled={status === "listening"}
-          className="flex items-center justify-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-medium text-neutral-700 disabled:opacity-50"
-        >
-          {status === "listening" ? "듣는 중... 지금 말해보세요" : "🎤 따라 말하고 채점하기"}
-        </button>
-      ) : (
+      {!supported && (
         <p className="text-[11px] text-neutral-400">
           이 브라우저는 음성 인식을 지원하지 않아요 (아이폰 사파리는 대부분 미지원) — 건너뛰기를 눌러주세요.
         </p>
       )}
 
-      {status === "error" && (
-        <p className="text-[11px] text-red-500">
-          마이크 인식에 실패했어요. 권한을 확인하거나 건너뛰어주세요.
-        </p>
+      {supported && (status === "idle" || status === "listening" || status === "error") && (
+        <div className="flex flex-col items-center gap-2 py-3">
+          <button
+            type="button"
+            onClick={handleRecord}
+            disabled={status === "listening"}
+            className={`flex h-16 w-16 items-center justify-center rounded-full text-2xl text-white transition-colors ${
+              status === "listening" ? "animate-pulse bg-red-500" : "bg-neutral-900"
+            }`}
+            aria-label="따라 말해보기"
+          >
+            🎤
+          </button>
+          <p className="text-[13px] font-medium text-neutral-600">
+            {status === "listening" ? "듣는 중... 지금 말해보세요" : "따라 말해보기"}
+          </p>
+          {status === "error" && (
+            <p className="text-[11px] text-red-500">
+              마이크 인식에 실패했어요. 다시 시도하거나 건너뛰어주세요.
+            </p>
+          )}
+        </div>
       )}
 
-      {result && heard !== null && (
+      {status === "ready" && (
+        <button
+          type="button"
+          onClick={() => setStatus("scored")}
+          className="rounded-full bg-neutral-900 px-4 py-3 text-[13px] font-bold text-white"
+        >
+          채점하기
+        </button>
+      )}
+
+      {status === "scored" && result && heard !== null && (
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
             <span
@@ -144,6 +167,13 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
             ))}
           </p>
           <p className="text-[11px] text-neutral-400">인식된 발음: &ldquo;{heard}&rdquo;</p>
+          <button
+            type="button"
+            onClick={handleRecord}
+            className="mt-1 self-start text-[11px] font-medium text-neutral-500 underline"
+          >
+            다시 시도하기
+          </button>
         </div>
       )}
     </div>

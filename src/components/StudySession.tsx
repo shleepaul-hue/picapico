@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { buildChoices, pickSessionPhrases, type Phrase } from "@/lib/phrasebank";
-import ShadowingRecorder from "@/components/ShadowingRecorderLoader";
 import PronunciationCheck from "@/components/PronunciationCheck";
 
 type Question = { phrase: Phrase; choices: string[] };
@@ -157,13 +156,6 @@ export default function StudySession() {
             >
               🔊 발음 듣기
             </button>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <p className="text-xs font-medium text-neutral-500">
-              소리 내어 따라 말해보세요
-            </p>
-            <ShadowingRecorder />
           </div>
 
           <PronunciationCheck
