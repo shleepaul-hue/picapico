@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import { toPng } from "html-to-image";
 
 // Figma wireframe: "⑤ 인스타 스토리 공유" (05_IGStoryShare), 9:16
@@ -21,6 +22,17 @@ export default function ShareCardPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center gap-5 px-5 py-8">
+      <div className="flex w-full max-w-[320px] items-center gap-2.5">
+        <Link
+          href="/complete"
+          aria-label="뒤로"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 text-xs font-bold text-neutral-600"
+        >
+          ←
+        </Link>
+        <span className="text-sm font-bold">공유 카드</span>
+      </div>
+
       {/* TODO: replace static copy with today's learning_sessions + profiles data */}
       <div
         ref={cardRef}

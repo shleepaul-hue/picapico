@@ -170,7 +170,14 @@ export default function StudySession({ destination, dDayLabel }: Props) {
 
   if (phase === "bonus-intro") {
     return (
-      <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-center gap-6 px-5 py-6 text-center">
+      <main className="relative mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-center gap-6 px-5 py-6 text-center">
+        <Link
+          href="/"
+          aria-label="닫기"
+          className="absolute left-5 top-6 flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 text-xs font-bold text-neutral-600"
+        >
+          X
+        </Link>
         <span className="text-xs font-bold text-neutral-400">STEP 2 · 응용문제</span>
         <h2 className="text-xl font-bold">
           오늘 배운 5개 표현,
