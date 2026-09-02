@@ -72,7 +72,12 @@ export default async function ArchivePage() {
       </div>
 
       <div className="rounded-2xl bg-neutral-100 p-4">
-        <p className="mb-2 text-xs font-medium text-neutral-600">최근 학습 기록</p>
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-xs font-medium text-neutral-600">최근 5주 학습 현황</p>
+          <span className="text-[11px] font-medium text-neutral-400">
+            총 {sessions.length}회 학습
+          </span>
+        </div>
         <ActivityCalendar
           data={heatmapData}
           showColorLegend={false}
@@ -88,33 +93,57 @@ export default async function ArchivePage() {
       <div className="flex flex-col gap-2.5">
         <h2 className="text-sm font-bold">지난 학습 세션</h2>
         {sessions.length === 0 && (
-          <p className="text-center text-xs text-neutral-400">
-            아직 학습 기록이 없어요. 오늘의 학습을 시작해보세요!
+          <p className="rounded-2xl border border-dashed border-neutral-200 px-4 py-8 text-center text-xs text-neutral-400">
+            아직 학습 기록이 없어요.
+            <br />
+            오늘의 학습을 시작해보세요!
           </p>
         )}
-        {sessions.map((s) => {
+        {sessions.map((s, i) => {
           const phrases = phrasesBySession.get(s.id) ?? [];
           const d = new Date(`${s.session_date}T00:00:00Z`);
-          const dateLabel = `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 (${
-            weekdayLabels[d.getUTCDay()]
-          })`;
-          const preview =
-            phrases.length > 1
-              ? `${phrases[0].spanish_text} 외 ${phrases.length - 1}개`
-              : (phrases[0]?.spanish_text ?? "");
+          const isToday = s.session_date === today.toISOString().slice(0, 10);
+          const isYesterday =
+            s.session_date ===
+            new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+          const dateLabel = isToday
+            ? "오늘"
+            : isYesterday
+              ? "어제"
+              : `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 (${
+                  weekdayLabels[d.getUTCDay()]
+                })`;
+          const firstPhrase = phrases[0];
 
           return (
             <div
               key={s.id}
-              className="flex flex-col gap-1 rounded-xl border border-neutral-100 px-4 py-3.5"
+              className="flex gap-3 rounded-2xl border border-neutral-100 px-4 py-3.5"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold">{dateLabel}</span>
-                <span className="text-[11px] text-neutral-500">
-                  {s.category ?? "스몰토크"} · 표현 {phrases.length}개
-                </span>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs font-bold text-white">
+                {sessions.length - i}
               </div>
-              <span className="text-xs text-neutral-500">{preview}</span>
+              <div className="flex flex-1 flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-bold">{dateLabel}</span>
+                  <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-medium text-neutral-500">
+                    {s.category ?? "스몰토크"} · {phrases.length}개
+                  </span>
+                </div>
+                {firstPhrase ? (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-medium text-neutral-700">
+                      &ldquo;{firstPhrase.spanish_text}&rdquo;
+                    </span>
+                    <span className="text-[11px] text-neutral-400">
+                      {firstPhrase.korean_translation}
+                      {phrases.length > 1 ? ` 외 ${phrases.length - 1}개` : ""}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-[11px] text-neutral-400">저장된 표현이 없어요</span>
+                )}
+              </div>
             </div>
           );
         })}

@@ -15,6 +15,7 @@ type SpeechRecognitionLike = {
   maxAlternatives: number;
   start: () => void;
   onresult: ((event: SpeechRecognitionResultLike) => void) | null;
+  onspeechend: (() => void) | null;
   onerror: (() => void) | null;
   onend: (() => void) | null;
 };
@@ -28,7 +29,7 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
-type Status = "idle" | "listening" | "ready" | "scored" | "error";
+type Status = "idle" | "listening" | "scoring" | "scored" | "error";
 
 type Props = {
   target: string;
@@ -37,12 +38,12 @@ type Props = {
   onAttempt: () => void;
 };
 
-// One combined "따라 말해보기 → 채점하기" flow: recording IS the speech
-// recognition pass (Web Speech API), so there's a single mic action instead
-// of a separate waveform recorder + a separate scoring button. The score is
-// an approximation (Web Speech API doesn't expose real phonetic scoring) —
-// framed as "참고용" so it isn't mistaken for the real thing. Not supported
-// on iOS Safari in most versions — "건너뛰기" keeps the flow moving there.
+// One combined "따라 말해보기 → 자동 채점" 흐름: 녹음이 곧 음성 인식(Web Speech
+// API) 시도라 별도의 웨이브폼 녹음기 + 별도의 "채점하기" 버튼이 필요 없다.
+// 말이 끝나면(onspeechend) "채점 중..."을 잠깐 보여주고, 인식 결과가 오면
+// (onresult) 자동으로 점수를 공개한다 — 사용자가 누를 버튼이 없다.
+// 점수는 근사치(Web Speech API는 실제 음소 단위 채점을 제공하지 않음) — "참고용"
+// 으로 프레이밍. 아이폰 사파리는 대부분 미지원 — "건너뛰기"로 흐름 유지.
 export default function PronunciationCheck({ target, onAttempt }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [heard, setHeard] = useState<string | null>(null);
@@ -59,17 +60,25 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
+    // 말이 끝난 시점에 바로 "채점 중" 상태로 전환 — 결과가 오기까지 약간의
+    // 처리 시간이 있으므로 그 사이를 빈 화면 대신 로딩으로 채운다.
+    recognition.onspeechend = () => setStatus((s) => (s === "listening" ? "scoring" : s));
+
     recognition.onresult = (event) => {
       const transcript = event.results[0]?.[0]?.transcript ?? "";
       setHeard(transcript);
       setResult(scorePronunciation(target, transcript));
-      setStatus("ready");
+      setStatus("scored");
       onAttempt();
     };
     recognition.onerror = () => setStatus("error");
+    // 결과 없이 인식이 끝났다면(무음 등) 처음 상태로 — 채점 중이던 건은 곧
+    // onresult가 뒤따라오거나 에러로 처리되므로 여기서 되돌리지 않는다.
     recognition.onend = () => setStatus((s) => (s === "listening" ? "idle" : s));
 
     setStatus("listening");
+    setResult(null);
+    setHeard(null);
     recognition.start();
   };
 
@@ -123,14 +132,17 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
         </div>
       )}
 
-      {status === "ready" && (
-        <button
-          type="button"
-          onClick={() => setStatus("scored")}
-          className="rounded-full bg-neutral-900 px-4 py-3 text-[13px] font-bold text-white"
-        >
-          채점하기
-        </button>
+      {status === "scoring" && (
+        <div className="flex flex-col items-center gap-2 py-3">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-900 text-2xl">
+            <span className="flex gap-1">
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:-0.3s]" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:-0.15s]" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white" />
+            </span>
+          </span>
+          <p className="text-[13px] font-medium text-neutral-600">채점 중...</p>
+        </div>
       )}
 
       {status === "scored" && result && heard !== null && (

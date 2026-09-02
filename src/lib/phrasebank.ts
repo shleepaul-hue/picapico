@@ -51,3 +51,14 @@ export function buildChoices(correct: Phrase, sessionPhrases: Phrase[]): string[
   ).slice(0, 3);
   return shuffle([...distractors, correct.korean]);
 }
+
+// 응용문제(bonus round): 뜻(한국어)을 보고 스페인어 표현을 고르는 역방향 회상.
+// 오늘 세션에서 함께 배운 나머지 표현들을 오답으로 써서 — 방금 익힌 것들끼리라
+// 서로 헷갈리기 쉬운, 자연히 "비슷한 단어/동사"인 오답이 나온다.
+export function buildBonusChoices(correct: Phrase, sessionPhrases: Phrase[]): string[] {
+  const pool = sessionPhrases.length > 3 ? sessionPhrases : PHRASE_BANK;
+  const distractors = shuffle(
+    pool.filter((p) => p.spanish !== correct.spanish).map((p) => p.spanish)
+  ).slice(0, 3);
+  return shuffle([...distractors, correct.spanish]);
+}

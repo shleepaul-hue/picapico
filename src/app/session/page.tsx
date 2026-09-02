@@ -1,18 +1,30 @@
-"use client";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { computeDDayLabel } from "@/lib/tripCountdown";
+import StudySessionLoader from "@/components/StudySessionLoader";
 
-import dynamic from "next/dynamic";
+// Server Component wrapper: fetches destination/D-day once so the client
+// quiz (and its branded transition screens) can show "여행까지 D-N" without
+// a second round-trip.
+export default async function StudySessionPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/signup");
 
-// The quiz session randomizes phrase selection + choice order, so it's
-// loaded client-only to avoid a server/client hydration mismatch.
-const StudySession = dynamic(() => import("@/components/StudySession"), {
-  ssr: false,
-  loading: () => (
-    <main className="mx-auto flex min-h-dvh w-full max-w-sm items-center justify-center px-5 py-6 text-sm text-neutral-400">
-      학습 준비 중...
-    </main>
-  ),
-});
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("destination, trip_date")
+    .eq("id", user.id)
+    .maybeSingle();
 
-export default function StudySessionPage() {
-  return <StudySession />;
+  const dDayLabel = computeDDayLabel(profile?.trip_date);
+
+  return (
+    <StudySessionLoader
+      destination={profile?.destination ?? null}
+      dDayLabel={dDayLabel}
+    />
+  );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { computeStreak, computeWeekActivity } from "@/lib/streak";
+import { computeDDayLabel } from "@/lib/tripCountdown";
 
 // Figma wireframe: "① 홈" (01_Home)
 // DB reads: profiles.destination/trip_date (countdown banner),
@@ -19,17 +20,7 @@ export default async function Home() {
     .eq("id", user.id)
     .maybeSingle();
 
-  let dDayLabel: string | null = null;
-  if (profile?.trip_date) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const trip = new Date(profile.trip_date);
-    trip.setHours(0, 0, 0, 0);
-    const diffDays = Math.round(
-      (trip.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    dDayLabel = diffDays >= 0 ? `D-${diffDays}` : `D+${Math.abs(diffDays)}`;
-  }
+  const dDayLabel = computeDDayLabel(profile?.trip_date);
 
   const { data: sessionRows } = await supabase
     .from("learning_sessions")
