@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { computeStreak, computeWeekActivity } from "@/lib/streak";
 
 // Figma wireframe: "① 홈" (01_Home)
 // DB reads: profiles.destination/trip_date (countdown banner),
@@ -30,13 +31,21 @@ export default async function Home() {
     dDayLabel = diffDays >= 0 ? `D-${diffDays}` : `D+${Math.abs(diffDays)}`;
   }
 
+  const { data: sessionRows } = await supabase
+    .from("learning_sessions")
+    .select("session_date")
+    .eq("user_id", user.id);
+  const sessionDates = (sessionRows ?? []).map((s) => s.session_date);
+  const streak = computeStreak(sessionDates);
+  const weekActivity = computeWeekActivity(sessionDates);
+
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-between px-5 pt-6">
       <div className="flex flex-1 flex-col items-center gap-5">
         <div className="flex w-full items-center justify-between">
           <h1 className="text-xl font-bold">PicaPico</h1>
           <span className="rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-600">
-            스트릭 5일째
+            {streak > 0 ? `${streak}일 연속 공부 중` : "오늘부터 시작해봐요"}
           </span>
         </div>
 
@@ -60,7 +69,6 @@ export default async function Home() {
           여행지에서 바로 써먹는 스페인어 한 마디, 하루 20분
         </p>
 
-        {/* TODO: navigate to /session and create a learning_sessions row */}
         <Link
           href="/session"
           className="w-full rounded-2xl bg-neutral-900 py-4 text-center font-bold text-white"
@@ -68,16 +76,17 @@ export default async function Home() {
           오늘의 학습 시작 (20분)
         </Link>
 
-        {/* TODO: derive from the last 7 learning_sessions.session_date rows */}
         <div className="flex gap-2.5">
-          {["월", "화", "수", "목", "금", "토", "일"].map((d, i) => (
-            <div key={d} className="flex flex-col items-center gap-1.5">
+          {weekActivity.map((day) => (
+            <div key={day.date} className="flex flex-col items-center gap-1.5">
               <span
                 className={`h-7 w-7 rounded-full ${
-                  i < 5 ? "bg-neutral-900" : "border border-neutral-300 bg-neutral-100"
-                }`}
+                  day.active
+                    ? "bg-neutral-900"
+                    : "border border-neutral-300 bg-neutral-100"
+                } ${day.isFuture ? "opacity-40" : ""}`}
               />
-              <span className="text-[11px] text-neutral-500">{d}</span>
+              <span className="text-[11px] text-neutral-500">{day.label}</span>
             </div>
           ))}
         </div>

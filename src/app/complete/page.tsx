@@ -1,14 +1,52 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { computeStreak } from "@/lib/streak";
 
 // Figma wireframe: "③ 완료" (03_Complete)
-// DB reads: today's learning_sessions row (duration, phrase count) + its phrases;
-// current streak = consecutive session_date count ending today
-export default function CompletePage() {
-  const phrases = [
-    ["¿De dónde eres?", "어디 출신이세요?"],
-    ["Mucho gusto", "만나서 반가워요"],
-    ["¿A dónde vas?", "어디 가세요?"],
-  ];
+// DB reads: the just-finished learning_sessions row (?session=<id>) + its
+// phrases, plus every session_date for this user to compute the streak.
+export default async function CompletePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ session?: string }>;
+}) {
+  const { session: sessionId } = await searchParams;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/signup");
+
+  let session: { id: string; duration_seconds: number } | null = null;
+  let phrases: { spanish_text: string; korean_translation: string }[] = [];
+
+  if (sessionId) {
+    const { data: sessionRow } = await supabase
+      .from("learning_sessions")
+      .select("id, duration_seconds")
+      .eq("id", sessionId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    session = sessionRow;
+
+    if (session) {
+      const { data: phraseRows } = await supabase
+        .from("phrases")
+        .select("spanish_text, korean_translation")
+        .eq("session_id", session.id);
+      phrases = phraseRows ?? [];
+    }
+  }
+
+  const { data: allSessions } = await supabase
+    .from("learning_sessions")
+    .select("session_date")
+    .eq("user_id", user.id);
+  const streak = computeStreak((allSessions ?? []).map((s) => s.session_date));
+
+  const durationMinutes = session ? Math.max(1, Math.round(session.duration_seconds / 60)) : 0;
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center gap-6 px-5 pb-8 pt-12">
@@ -18,14 +56,14 @@ export default function CompletePage() {
 
       <h1 className="text-center text-xl font-bold">오늘의 학습 완료!</h1>
       <p className="text-center text-[13px] text-neutral-500">
-        5일 연속 학습 중이에요 — 이대로만 가면 발리에서 술술!
+        {streak}일 연속 학습 중이에요 — 이대로만 가면 발리에서 술술!
       </p>
 
       <div className="grid w-full grid-cols-3 gap-3">
         {[
-          ["4개", "새 표현"],
-          ["18분", "학습 시간"],
-          ["5일", "연속 학습"],
+          [`${phrases.length}개`, "새 표현"],
+          [`${durationMinutes}분`, "학습 시간"],
+          [`${streak}일`, "연속 학습"],
         ].map(([value, label]) => (
           <div
             key={label}
@@ -39,13 +77,18 @@ export default function CompletePage() {
 
       <div className="flex w-full flex-col gap-2">
         <h2 className="text-sm font-bold">오늘 배운 표현</h2>
-        {phrases.map(([es, ko]) => (
+        {phrases.length === 0 && (
+          <p className="text-center text-xs text-neutral-400">
+            표시할 학습 기록이 없어요.
+          </p>
+        )}
+        {phrases.map((p) => (
           <div
-            key={es}
+            key={p.spanish_text}
             className="flex items-center justify-between rounded-xl border border-neutral-100 px-3.5 py-3"
           >
-            <span className="text-[13px] font-medium">{es}</span>
-            <span className="text-xs text-neutral-500">{ko}</span>
+            <span className="text-[13px] font-medium">{p.spanish_text}</span>
+            <span className="text-xs text-neutral-500">{p.korean_translation}</span>
           </div>
         ))}
       </div>

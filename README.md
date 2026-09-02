@@ -59,10 +59,18 @@ Apple Developer Program(연 $99) 가입이 필요해서 보류 중. 가입 후:
 2. [Supabase Dashboard > Authentication > Providers > Apple](https://supabase.com/dashboard/project/_/auth/providers)에 설정 입력
 3. `src/components/SocialLoginButtons.tsx`의 Apple 버튼에서 `disabled` 제거하고 `signInWithOAuth({ provider: "apple" })` 연결
 
+## 학습 세션 흐름
+
+표현마다 두 단계로 진행한다 (콜드 게스로 퀴즈부터 보여주지 않기 위함):
+
+1. **학습**: 스페인어 표현 + 뜻 + 발음 듣기(브라우저 TTS) + 섀도잉 녹음(waveform, `react-voice-visualizer`) + 발음 정확도 확인(`PronunciationCheck`, 브라우저 음성인식으로 목표 문장과 비교해 대략적인 일치율 표시 — 참고용, 아이폰 사파리는 대부분 미지원이라 건너뛰기 제공)
+2. **퀴즈**: 뜻 가리고 4지선다로 회상 확인
+
+세션 완료 시 `learning_sessions` 1행 + 그 회차에서 배운 `phrases` N행(표현마다 1행)만 저장한다 — 개별 퀴즈 시도나 발음 채점 결과는 저장하지 않아 DB가 무한정 늘어나지 않는다. 스트릭·주간 점·완료 화면 통계는 모두 이 두 테이블에서 매번 계산한다 (`src/lib/streak.ts`).
+
 ## 남은 작업
 
-- 발음 듣기: Web Speech API 또는 TTS API 연동
-- 섀도잉 녹음 파일 Supabase Storage 업로드
-- 온보딩 입력값 → `profiles` 테이블 저장 (지금은 폼만 있고 저장 로직 없음)
-- 학습 세션 진행 상태 관리 (퀴즈 정답 체크, 다음 버튼 활성화)
-- 로그아웃 기능
+- 섀도잉 녹음 파일 Supabase Storage 업로드 (지금은 녹음/재생만, 저장 안 함)
+- 발음 채점 고도화: 지금은 Web Speech API 텍스트 비교 기반의 대략적인 채점(무료, 아이폰 사파리 미지원). 더 정확한 원어민 비교가 필요해지면 OpenAI/Google 등 유료 TTS+발음 평가 API로 교체 고려
+- 아카이브에서 지난 세션 표현으로 다시 퀴즈 보는 "복습 모드" (지금은 목록 열람만 가능)
+- 인스타 스토리 공유 카드에 실제 프로필/스트릭 데이터 연결 (지금은 정적 목업)
