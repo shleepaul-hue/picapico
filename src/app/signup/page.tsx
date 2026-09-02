@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import SocialLoginButtons from "@/components/SocialLoginButtons";
+import AuthGateLoader from "@/components/AuthGateLoader";
 
 // Figma wireframe: "⓪-1 가입" (00_SignUp)
 // DB: on successful OAuth, the on_auth_user_created trigger (supabase/schema.sql)
@@ -29,7 +29,7 @@ export default async function SignUpPage() {
       </div>
 
       <div className="flex w-full flex-col gap-3">
-        <SocialLoginButtons />
+        <AuthGateLoader />
 
         <div className="flex items-center gap-2 py-1 text-xs text-neutral-500">
           <span className="h-px flex-1 bg-neutral-300" />
