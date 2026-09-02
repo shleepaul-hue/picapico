@@ -21,6 +21,7 @@ export default function InAppBrowserWarning({ detected, isAndroid }: Props) {
       </p>
       <p className="text-[12px] leading-relaxed text-amber-700">
         카카오톡 등 인앱 브라우저에서는 구글 로그인이 끝까지 진행되지 않아요.
+        자동으로 다른 브라우저를 열어보는 중이에요 — 잠시 후에도 그대로면,
         {isAndroid ? " 아래 버튼으로 크롬에서 열거나, " : " "}
         오른쪽 아래 메뉴(••• 또는 ⋮)에서 &ldquo;다른 브라우저로 열기&rdquo;를 눌러
         Safari나 Chrome으로 열어주세요.

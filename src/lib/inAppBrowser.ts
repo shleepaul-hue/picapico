@@ -9,3 +9,11 @@ export function isInAppBrowserUserAgent(ua: string): boolean {
 export function isAndroidUserAgent(ua: string): boolean {
   return /Android/i.test(ua);
 }
+
+// KakaoTalk's in-app browser (and only KakaoTalk's, among the ones above)
+// honors a custom URL scheme that hands the current page straight to the
+// device's default browser, with no "open in another browser" menu-diving
+// required. See AuthGate for where this is used.
+export function isKakaoTalkUserAgent(ua: string): boolean {
+  return /KAKAOTALK/i.test(ua);
+}
