@@ -12,6 +12,24 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/signup");
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("destination, trip_date")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  let dDayLabel: string | null = null;
+  if (profile?.trip_date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const trip = new Date(profile.trip_date);
+    trip.setHours(0, 0, 0, 0);
+    const diffDays = Math.round(
+      (trip.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    dDayLabel = diffDays >= 0 ? `D-${diffDays}` : `D+${Math.abs(diffDays)}`;
+  }
+
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-between px-5 pt-6">
       <div className="flex flex-1 flex-col items-center gap-5">
@@ -22,11 +40,12 @@ export default async function Home() {
           </span>
         </div>
 
-        {/* TODO: compute from profiles.destination / trip_date */}
-        <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-3.5 py-2 text-xs font-medium text-neutral-600">
-          <span>발리, 인도네시아 여행까지</span>
-          <span className="font-bold text-neutral-900">D-45</span>
-        </div>
+        {profile?.destination && dDayLabel && (
+          <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-3.5 py-2 text-xs font-medium text-neutral-600">
+            <span>{profile.destination} 여행까지</span>
+            <span className="font-bold text-neutral-900">{dDayLabel}</span>
+          </div>
+        )}
 
         <div className="flex h-[220px] w-full items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-neutral-100 text-center text-sm font-medium text-neutral-500">
           [캐릭터 일러스트]
