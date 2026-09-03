@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 type Props = {
@@ -78,9 +79,9 @@ export default function OnboardingForm({
           <Link
             href="/profile"
             aria-label="뒤로"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 text-xs font-bold text-neutral-600"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 text-neutral-600 transition-transform active:scale-90"
           >
-            ←
+            <ArrowLeft size={16} strokeWidth={2.2} />
           </Link>
         ) : (
           <div className="flex gap-1.5">
@@ -99,7 +100,7 @@ export default function OnboardingForm({
           </span>
           <input
             className="rounded-xl border border-neutral-300 px-4 py-3.5 text-[15px] font-medium"
-            placeholder="발리, 인도네시아"
+            placeholder="바르셀로나, 스페인"
             name="destination"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
@@ -163,7 +164,7 @@ export default function OnboardingForm({
         type="button"
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform active:enabled:scale-95 disabled:opacity-40"
+        className="w-full rounded-2xl bg-rosa py-4 font-bold text-white transition-transform active:enabled:scale-95 disabled:opacity-40"
       >
         {saving ? "저장 중..." : isEditing ? "저장하기" : "시작하기"}
       </button>

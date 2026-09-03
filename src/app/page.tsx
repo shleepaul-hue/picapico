@@ -1,9 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { House, Library, UserSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { computeStreak, computeWeekActivity } from "@/lib/streak";
 import { computeDDayLabel } from "@/lib/tripCountdown";
+import { getDestinationFlag } from "@/lib/destinationFlag";
 
 // Figma wireframe: "① 홈" (01_Home)
 // DB reads: profiles.destination/trip_date (countdown banner),
@@ -22,6 +24,7 @@ export default async function Home() {
     .maybeSingle();
 
   const dDayLabel = computeDDayLabel(profile?.trip_date);
+  const destinationFlag = getDestinationFlag(profile?.destination);
 
   const { data: sessionRows } = await supabase
     .from("learning_sessions")
@@ -49,15 +52,21 @@ export default async function Home() {
 
         {profile?.destination && dDayLabel && (
           <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-3.5 py-2 text-xs font-medium text-neutral-600">
+            {destinationFlag && <span aria-hidden>{destinationFlag}</span>}
             <span>{profile.destination} 여행까지</span>
-            <span className="font-bold text-neutral-900">{dDayLabel}</span>
+            <span className="font-bold text-ink">{dDayLabel}</span>
           </div>
         )}
 
-        <div className="flex h-[220px] w-full items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-neutral-100 text-center text-sm font-medium text-neutral-500">
-          [캐릭터 일러스트]
-          <br />
-          콜리브리(벌새) 인사 모션
+        <div className="flex h-[220px] w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-rosa-50 to-arena">
+          <Image
+            src="/bird-face.png"
+            alt="PicaPico 콜리브리 캐릭터가 인사하는 모습"
+            width={230}
+            height={180}
+            className="animate-drop-in h-[190px] w-auto"
+            priority
+          />
         </div>
 
         <h2 className="text-center text-lg font-bold">
@@ -69,7 +78,7 @@ export default async function Home() {
 
         <Link
           href="/session"
-          className="w-full rounded-2xl bg-neutral-900 py-4 text-center font-bold text-white transition-transform active:scale-95"
+          className="w-full rounded-2xl bg-rosa py-4 text-center font-bold text-white transition-transform active:scale-95"
         >
           오늘의 학습 시작 (20분)
         </Link>
@@ -94,7 +103,7 @@ export default async function Home() {
         </Link>
       </div>
 
-      <nav className="flex items-center justify-between border-t border-neutral-100 pb-6 pt-3.5">
+      <nav className="flex items-center justify-center gap-14 border-t border-neutral-100 pb-6 pt-3.5">
         {[
           { label: "홈", href: "/", Icon: House, active: true },
           { label: "아카이브", href: "/archive", Icon: Library, active: false },

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { Mic, Info } from "lucide-react";
 import { scorePronunciation, type PronunciationResult } from "@/lib/pronunciation";
 
 // Browser Speech Recognition (Web Speech API) isn't in the default TS lib —
@@ -42,8 +44,10 @@ type Props = {
 // API) 시도라 별도의 웨이브폼 녹음기 + 별도의 "채점하기" 버튼이 필요 없다.
 // 말이 끝나면(onspeechend) "채점 중..."을 잠깐 보여주고, 인식 결과가 오면
 // (onresult) 자동으로 점수를 공개한다 — 사용자가 누를 버튼이 없다.
-// 점수는 근사치(Web Speech API는 실제 음소 단위 채점을 제공하지 않음) — "참고용"
-// 으로 프레이밍. 아이폰 사파리는 대부분 미지원 — "건너뛰기"로 흐름 유지.
+// 점수는 근사치(Web Speech API는 실제 음소 단위 채점을 제공하지 않음) — 카드
+// 안에 긴 안내 문구를 두는 대신 "안내" 아이콘으로 /pronunciation-guide 해설
+// 페이지를 연결해 필요한 사람만 자세히 보게 한다. 아이폰 사파리는 대부분
+// 미지원 — "건너뛰기"로 흐름 유지.
 export default function PronunciationCheck({ target, onAttempt }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [heard, setHeard] = useState<string | null>(null);
@@ -90,9 +94,15 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
   return (
     <div className="flex flex-col gap-3 rounded-xl bg-neutral-50 p-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-neutral-500">
-          소리 내어 따라 말해보세요 (참고용 채점)
-        </p>
+        <Link
+          href="/pronunciation-guide"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-[11px] font-medium text-neutral-400"
+        >
+          <Info size={13} strokeWidth={2} />
+          발음 체크 안내
+        </Link>
         <button
           type="button"
           onClick={handleSkip}
@@ -114,12 +124,12 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
             type="button"
             onClick={handleRecord}
             disabled={status === "listening"}
-            className={`flex h-16 w-16 items-center justify-center rounded-full text-2xl text-white transition-colors ${
-              status === "listening" ? "animate-pulse bg-red-500" : "bg-neutral-900"
+            className={`flex h-16 w-16 items-center justify-center rounded-full text-white transition-colors ${
+              status === "listening" ? "animate-pulse bg-red-500" : "bg-rosa"
             }`}
             aria-label="따라 말해보기"
           >
-            🎤
+            <Mic size={26} strokeWidth={2} />
           </button>
           <p className="text-[13px] font-medium text-neutral-600">
             {status === "listening" ? "듣는 중... 지금 말해보세요" : "따라 말해보기"}
@@ -134,7 +144,7 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
 
       {status === "scoring" && (
         <div className="flex flex-col items-center gap-2 py-3">
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-900 text-2xl">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-rosa text-2xl">
             <span className="flex gap-1">
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:-0.3s]" />
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:-0.15s]" />
@@ -171,7 +181,7 @@ export default function PronunciationCheck({ target, onAttempt }: Props) {
             {result.words.map((w, i) => (
               <span
                 key={`${w.word}-${i}`}
-                className={w.matched ? "text-neutral-900" : "text-red-500 underline"}
+                className={w.matched ? "text-ink" : "text-red-500 underline"}
               >
                 {w.word}
                 {i < result.words.length - 1 ? " " : ""}

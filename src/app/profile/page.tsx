@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { House, Library, UserSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/SignOutButton";
+import { getDestinationFlag } from "@/lib/destinationFlag";
 
 // Bottom nav "프로필" 탭 — 계정 정보 확인 + 로그아웃.
 // (전용 와이어프레임은 아직 없어서, 필요한 정보 위주로 최소 구성)
@@ -18,6 +19,7 @@ export default async function ProfilePage() {
     .select("display_name, destination, trip_date, reminder_enabled, reminder_time")
     .eq("id", user.id)
     .maybeSingle();
+  const destinationFlag = getDestinationFlag(profile?.destination);
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-between px-5 pt-6">
@@ -34,7 +36,10 @@ export default async function ProfilePage() {
         <div className="flex flex-col gap-3 rounded-2xl border border-neutral-200 p-4 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-neutral-500">여행지</span>
-            <span className="font-medium">{profile?.destination ?? "미설정"}</span>
+            <span className="font-medium">
+              {destinationFlag && <span aria-hidden>{destinationFlag} </span>}
+              {profile?.destination ?? "미설정"}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-neutral-500">여행 날짜</span>
@@ -61,7 +66,7 @@ export default async function ProfilePage() {
       <div className="flex flex-col gap-4 pb-6">
         <SignOutButton />
 
-        <nav className="flex items-center justify-between border-t border-neutral-100 pb-2 pt-3.5">
+        <nav className="flex items-center justify-center gap-14 border-t border-neutral-100 pb-2 pt-3.5">
           {[
             { label: "홈", href: "/", Icon: House, active: false },
             { label: "아카이브", href: "/archive", Icon: Library, active: false },

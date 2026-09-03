@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Volume2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
   buildBonusChoices,
@@ -195,7 +196,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
         <button
           type="button"
           onClick={() => setPhase("bonus")}
-          className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform active:scale-95"
+          className="w-full rounded-2xl bg-rosa py-4 font-bold text-white transition-transform active:scale-95"
         >
           응용문제 시작하기 (5문제)
         </button>
@@ -218,11 +219,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
             <span
               key={`${phase === "bonus" ? "b" : "m"}-${q.phrase.spanish}`}
               className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
-                i <= index
-                  ? phase === "bonus"
-                    ? "bg-rosa"
-                    : "bg-neutral-900"
-                  : "bg-neutral-100"
+                i <= index ? "bg-rosa" : "bg-neutral-100"
               }`}
             />
           ))}
@@ -242,7 +239,8 @@ export default function StudySession({ destination, dDayLabel }: Props) {
               onClick={handleSpeak}
               className="flex items-center gap-2 rounded-full bg-neutral-100 px-4.5 py-2.5 text-[13px] font-medium text-neutral-600"
             >
-              🔊 발음 듣기
+              <Volume2 size={15} strokeWidth={2} />
+              발음 듣기
             </button>
           </div>
 
@@ -255,7 +253,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
             type="button"
             onClick={goToQuiz}
             disabled={!attemptedPronunciation}
-            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
+            className="w-full rounded-2xl bg-rosa py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
           >
             퀴즈 풀어보기 →
           </button>
@@ -301,7 +299,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
             type="button"
             onClick={handleNext}
             disabled={selected === null}
-            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
+            className="w-full rounded-2xl bg-rosa py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
           >
             {isLast ? "응용문제로 →" : "다음"}
           </button>
@@ -351,7 +349,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
             type="button"
             onClick={handleBonusNext}
             disabled={selected === null}
-            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
+            className="w-full rounded-2xl bg-rosa py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
           >
             {isBonusLast ? "완료" : "다음"}
           </button>

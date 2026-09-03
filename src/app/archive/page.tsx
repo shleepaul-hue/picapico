@@ -1,12 +1,25 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ActivityCalendar } from "react-activity-calendar";
-import { House, Library, UserSquare } from "lucide-react";
+import { House, Library, Star, UserSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import ArchiveTabs, { type ArchiveTab } from "@/components/ArchiveTabs";
+
+const CATEGORY_TABS = ["스몰토크", "인사"] as const;
 
 // Figma wireframe: "④ 아카이브" (04_Archive)
 // DB reads: learning_sessions (list + heatmap) joined with their phrases
-export default async function ArchivePage() {
+// (now including is_favorite, so the "즐겨찾기" tab is real data rather than
+// decorative). Tabs are driven by ?tab= in the URL so filtering works as a
+// plain server-rendered link — see ArchiveTabs for the disabled/tooltip UI.
+export default async function ArchivePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const { tab: rawTab } = await searchParams;
+  const activeTab = rawTab && rawTab !== "" ? rawTab : "전체";
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -19,26 +32,27 @@ export default async function ArchivePage() {
     .eq("user_id", user.id)
     .order("session_date", { ascending: false })
     .limit(30);
-  const sessions = sessionRows ?? [];
+  const allSessions = sessionRows ?? [];
 
-  const sessionIds = sessions.map((s) => s.id);
+  const sessionIds = allSessions.map((s) => s.id);
   const { data: phraseRows } =
     sessionIds.length > 0
       ? await supabase
           .from("phrases")
-          .select("session_id, spanish_text, korean_translation")
+          .select("session_id, spanish_text, korean_translation, is_favorite")
           .in("session_id", sessionIds)
       : {
           data: [] as {
             session_id: string;
             spanish_text: string;
             korean_translation: string;
+            is_favorite: boolean;
           }[],
         };
 
   const phrasesBySession = new Map<
     string,
-    { spanish_text: string; korean_translation: string }[]
+    { spanish_text: string; korean_translation: string; is_favorite: boolean }[]
   >();
   for (const p of phraseRows ?? []) {
     const list = phrasesBySession.get(p.session_id) ?? [];
@@ -46,13 +60,40 @@ export default async function ArchivePage() {
     phrasesBySession.set(p.session_id, list);
   }
 
+  const sessionHasFavorite = (sessionId: string) =>
+    (phrasesBySession.get(sessionId) ?? []).some((p) => p.is_favorite);
+
+  // Availability is computed from the FULL fetched set, independent of the
+  // currently selected tab, so a tab's enabled/disabled state doesn't shift
+  // depending on what's currently filtered.
+  const tabs: ArchiveTab[] = [
+    { key: "전체", label: "전체", enabled: allSessions.length > 0 },
+    ...CATEGORY_TABS.map((cat) => ({
+      key: cat,
+      label: cat,
+      enabled: allSessions.some((s) => s.category === cat),
+    })),
+    {
+      key: "즐겨찾기",
+      label: "즐겨찾기",
+      enabled: allSessions.some((s) => sessionHasFavorite(s.id)),
+    },
+  ];
+
+  const sessions =
+    activeTab === "전체"
+      ? allSessions
+      : activeTab === "즐겨찾기"
+        ? allSessions.filter((s) => sessionHasFavorite(s.id))
+        : allSessions.filter((s) => s.category === activeTab);
+
   // Heatmap needs a value for every day in a contiguous range — fill in the
   // last ~5 weeks so react-activity-calendar always has a full grid, even
   // before any sessions exist.
   const heatmapDays = 35;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const sessionDateSet = new Set(sessions.map((s) => s.session_date));
+  const sessionDateSet = new Set(allSessions.map((s) => s.session_date));
   const heatmapData = Array.from({ length: heatmapDays }).map((_, i) => {
     const d = new Date(
       today.getTime() - (heatmapDays - 1 - i) * 24 * 60 * 60 * 1000,
@@ -72,24 +113,11 @@ export default async function ArchivePage() {
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-between px-5 py-6">
       <div className="flex flex-col gap-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">아카이브</h1>
+          <h1 className="text-xl font-bold text-ink">아카이브</h1>
           <span className="h-6 w-6 rounded-full border border-neutral-400" />
         </div>
 
-        <div className="flex gap-2 overflow-x-auto">
-          {["전체", "스몰토크", "인사", "즐겨찾기"].map((tab, i) => (
-            <button
-              key={tab}
-              className={`rounded-full px-3.5 py-2 text-xs font-medium ${
-                i === 0
-                  ? "bg-neutral-900 text-white"
-                  : "bg-neutral-100 text-neutral-600"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+        <ArchiveTabs tabs={tabs} activeTab={activeTab} />
 
         <div className="rounded-2xl bg-neutral-100 p-4">
           <div className="mb-3 flex items-center justify-between">
@@ -97,7 +125,7 @@ export default async function ArchivePage() {
               최근 5주 학습 현황
             </p>
             <span className="text-[11px] font-medium text-neutral-400">
-              총 {sessions.length}회 학습
+              총 {allSessions.length}회 학습
             </span>
           </div>
           <ActivityCalendar
@@ -116,16 +144,27 @@ export default async function ArchivePage() {
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <h2 className="text-sm font-bold">지난 학습 세션</h2>
+          <h2 className="text-sm font-bold text-ink">지난 학습 세션</h2>
           {sessions.length === 0 && (
             <p className="rounded-2xl border border-dashed border-neutral-200 px-4 py-8 text-center text-xs text-neutral-400">
-              아직 학습 기록이 없어요.
-              <br />
-              오늘의 학습을 시작해보세요!
+              {activeTab === "전체" ? (
+                <>
+                  아직 학습 기록이 없어요.
+                  <br />
+                  오늘의 학습을 시작해보세요!
+                </>
+              ) : (
+                <>
+                  이 카테고리엔 아직 기록이 없어요.
+                  <br />
+                  공부가 더 필요해요!
+                </>
+              )}
             </p>
           )}
-          {sessions.map((s, i) => {
+          {sessions.map((s) => {
             const phrases = phrasesBySession.get(s.id) ?? [];
+            const hasFavorite = phrases.some((p) => p.is_favorite);
             const d = new Date(`${s.session_date}T00:00:00Z`);
             const isToday = s.session_date === today.toISOString().slice(0, 10);
             const isYesterday =
@@ -145,43 +184,43 @@ export default async function ArchivePage() {
             return (
               <div
                 key={s.id}
-                className="flex gap-3 rounded-2xl border border-neutral-100 px-4 py-3.5"
+                className={`flex flex-col gap-1.5 rounded-2xl border border-l-[3px] bg-white px-4 py-3.5 ${
+                  isToday ? "border-neutral-100 border-l-rosa" : "border-neutral-100 border-l-neutral-200"
+                }`}
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs font-bold text-white">
-                  {sessions.length - i}
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-[13px] font-bold text-ink">
+                    {dateLabel}
+                    {hasFavorite && (
+                      <Star size={12} className="fill-rosa text-rosa" strokeWidth={0} />
+                    )}
+                  </span>
+                  <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-medium text-neutral-500">
+                    {s.category ?? "스몰토크"} · {phrases.length}개
+                  </span>
                 </div>
-                <div className="flex flex-1 flex-col gap-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[13px] font-bold">{dateLabel}</span>
-                    <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-medium text-neutral-500">
-                      {s.category ?? "스몰토크"} · {phrases.length}개
+                {firstPhrase ? (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-medium text-neutral-700">
+                      &ldquo;{firstPhrase.spanish_text}&rdquo;
+                    </span>
+                    <span className="text-[11px] text-neutral-400">
+                      {firstPhrase.korean_translation}
+                      {phrases.length > 1 ? ` 외 ${phrases.length - 1}개` : ""}
                     </span>
                   </div>
-                  {firstPhrase ? (
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs font-medium text-neutral-700">
-                        &ldquo;{firstPhrase.spanish_text}&rdquo;
-                      </span>
-                      <span className="text-[11px] text-neutral-400">
-                        {firstPhrase.korean_translation}
-                        {phrases.length > 1
-                          ? ` 외 ${phrases.length - 1}개`
-                          : ""}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-[11px] text-neutral-400">
-                      저장된 표현이 없어요
-                    </span>
-                  )}
-                </div>
+                ) : (
+                  <span className="text-[11px] text-neutral-400">
+                    저장된 표현이 없어요
+                  </span>
+                )}
               </div>
             );
           })}
         </div>
       </div>
 
-      <nav className="flex items-center justify-between border-t border-neutral-100 pb-6 pt-3.5">
+      <nav className="flex items-center justify-center gap-14 border-t border-neutral-100 pb-6 pt-3.5">
         {[
           { label: "홈", href: "/", Icon: House, active: false },
           { label: "아카이브", href: "/archive", Icon: Library, active: true },
