@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Home, BookOpen, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/SignOutButton";
 
@@ -62,22 +63,21 @@ export default async function ProfilePage() {
 
         <nav className="flex items-center justify-between border-t border-neutral-100 pb-2 pt-3.5">
           {[
-            { label: "홈", href: "/", icon: "🏠", active: false },
-            { label: "아카이브", href: "/archive", icon: "📚", active: false },
-            { label: "프로필", href: "/profile", icon: "👤", active: true },
+            { label: "홈", href: "/", Icon: Home, active: false },
+            { label: "아카이브", href: "/archive", Icon: BookOpen, active: false },
+            { label: "프로필", href: "/profile", Icon: User, active: true },
           ].map((tab) => (
             <Link
               key={tab.label}
               href={tab.href}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
-              <span
-                className={`text-lg leading-none transition-all ${
-                  tab.active ? "scale-110" : "opacity-45 grayscale"
-                }`}
-              >
-                {tab.icon}
-              </span>
+              <tab.Icon
+                className={`transition-transform ${tab.active ? "scale-110" : ""}`}
+                size={22}
+                strokeWidth={tab.active ? 2.4 : 1.8}
+                color={tab.active ? "var(--rosa)" : "#a3a3a3"}
+              />
               <span
                 className={`text-[11px] ${
                   tab.active ? "font-bold text-rosa" : "text-neutral-500"
