@@ -27,6 +27,12 @@ export const viewport: Viewport = {
   themeColor: "#262626",
   width: "device-width",
   initialScale: 1,
+  // PicaPico only ships a light UI — this stops the browser from applying
+  // its own automatic dark rendering (canvas/scrollbar/overscroll areas
+  // turning black) when the OS is set to dark mode. Paired with
+  // `color-scheme: light` in globals.css; the <meta> tag this generates
+  // takes effect before CSS even loads, so it catches the initial paint too.
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

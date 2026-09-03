@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
 :root {
+  /* PicaPico is a fixed light-mode design (see picapico-design-system.html)
+     — no component adapts to dark mode. Without this, browsers apply their
+     own automatic dark rendering (canvas/scrollbar/overscroll fill turns
+     black) whenever the OS is set to dark, even though every element below
+     still paints itself with light colors — that mismatch is what shows up
+     as "black" patches. Declaring color-scheme: light opts the whole page
+     out of that automatic dark behavior. */
+  color-scheme: light;
+
   --background: #ffffff;
   --foreground: #171717;
 
@@ -40,11 +49,8 @@
   --color-arena: var(--arena);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--background);
 }
 
 body {
