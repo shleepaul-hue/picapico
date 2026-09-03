@@ -38,13 +38,19 @@ export default function ArchiveTabs({ tabs, activeTab }: Props) {
   }, [openTooltip]);
 
   return (
-    <div ref={containerRef} className="flex gap-2 overflow-x-auto pb-1">
+    <div ref={containerRef} className="flex gap-2">
       {tabs.map((tab) => {
         const isActive = tab.key === activeTab;
 
         if (!tab.enabled) {
           return (
             <div key={tab.key} className="relative shrink-0">
+              {openTooltip === tab.key && (
+                <div className="absolute bottom-full left-1/2 z-10 mb-2 w-max -translate-x-1/2 rounded-xl bg-ink px-3 py-2 text-[11px] font-medium text-white">
+                  공부가 더 필요해요
+                  <span className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-ink" />
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => setOpenTooltip((t) => (t === tab.key ? null : tab.key))}
@@ -52,12 +58,6 @@ export default function ArchiveTabs({ tabs, activeTab }: Props) {
               >
                 {tab.label}
               </button>
-              {openTooltip === tab.key && (
-                <div className="absolute left-1/2 top-full z-10 mt-2 w-max -translate-x-1/2 rounded-xl bg-ink px-3 py-2 text-[11px] font-medium text-white">
-                  공부가 더 필요해요
-                  <span className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-ink" />
-                </div>
-              )}
             </div>
           );
         }

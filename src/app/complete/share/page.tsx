@@ -3,12 +3,13 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { toPng } from "html-to-image";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 // Figma wireframe: "⑤ 인스타 스토리 공유" (05_IGStoryShare), 9:16
-// Layout follows the latest revision: character centered, two arrow-style
-// stat lines directly beneath it (streak -> total days, start -> trip date),
-// no QR/CTA — just a small "PICAPICO" wordmark at the bottom.
+// Layout: character centered, a fire-emoji streak pill (matching the Home
+// screen's badge) directly beneath it, then just the trip date + a small
+// flag for the destination — no start date, no destination name, no circle
+// bullet, no QR/CTA — just a small "PicaPico" wordmark at the bottom.
 export default function ShareCardPage() {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -57,26 +58,19 @@ export default function ShareCardPage() {
             />
           </div>
 
-          <div className="flex flex-col items-center gap-2.5">
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-rosa" />
-              <span className="text-lg font-bold text-ink">5일 연속</span>
-              <ArrowRight size={14} strokeWidth={2.5} className="text-rosa-200" />
-              <span className="text-[15px] font-medium text-neutral-600">
-                총 12일째 공부
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-[13px]">
-              <span className="font-medium text-neutral-600">8월 20일 시작</span>
-              <ArrowRight size={12} strokeWidth={2.5} className="text-rosa-200" />
+          <div className="flex flex-col items-center gap-2">
+            <span className="rounded-full bg-rosa-50 px-3.5 py-1.5 text-sm font-bold text-rosa-600">
+              🔥 5일 연속
+            </span>
+            <span className="flex items-center gap-1.5 text-[13px] font-medium text-neutral-600">
+              10월 15일
               <span aria-hidden>🇪🇸</span>
-              <span className="font-bold text-ink">10월 15일 바르셀로나 여행</span>
-            </div>
+            </span>
           </div>
         </div>
 
         <span className="text-[11px] font-bold tracking-wide text-neutral-400">
-          PICAPICO
+          PicaPico
         </span>
       </div>
 

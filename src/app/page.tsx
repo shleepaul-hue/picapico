@@ -1,11 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { House, Library, UserSquare } from "lucide-react";
+import { House, Library, UserSquare, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { computeStreak, computeWeekActivity } from "@/lib/streak";
 import { computeDDayLabel } from "@/lib/tripCountdown";
 import { getDestinationFlag } from "@/lib/destinationFlag";
+import SpanishGreetingRotator from "@/components/SpanishGreetingRotator";
 
 // Figma wireframe: "① 홈" (01_Home)
 // DB reads: profiles.destination/trip_date (countdown banner),
@@ -40,7 +41,7 @@ export default async function Home() {
         <div className="flex w-full items-center justify-between">
           <h1 className="text-xl font-bold">PicaPico</h1>
           <span
-            className={`rounded-full px-3 py-1.5 text-xs font-medium ${
+            className={`rounded-full px-3 py-1.5 text-xs font-bold ${
               streak > 0
                 ? "bg-rosa-50 text-rosa-600"
                 : "bg-neutral-100 text-neutral-600"
@@ -54,11 +55,12 @@ export default async function Home() {
           <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-3.5 py-2 text-xs font-medium text-neutral-600">
             {destinationFlag && <span aria-hidden>{destinationFlag}</span>}
             <span>{profile.destination} 여행까지</span>
-            <span className="font-bold text-ink">{dDayLabel}</span>
+            <span className="font-bold text-rosa-600">{dDayLabel}</span>
           </div>
         )}
 
-        <div className="flex h-[220px] w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-rosa-50 to-arena">
+        <div className="relative flex h-[220px] w-full items-end justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-rosa-50 to-arena">
+          <SpanishGreetingRotator className="absolute top-4 left-1/2 -translate-x-1/2" />
           <Image
             src="/bird-face.png"
             alt="PicaPico 콜리브리 캐릭터가 인사하는 모습"
@@ -84,18 +86,23 @@ export default async function Home() {
         </Link>
 
         <div className="flex gap-2.5">
-          {weekActivity.map((day) => (
-            <div key={day.date} className="flex flex-col items-center gap-1.5">
-              <span
-                className={`h-7 w-7 rounded-full transition-colors ${
-                  day.active
-                    ? "bg-rosa"
-                    : "border border-neutral-300 bg-neutral-100"
-                } ${day.isFuture ? "opacity-40" : ""}`}
-              />
-              <span className="text-[11px] text-neutral-500">{day.label}</span>
-            </div>
-          ))}
+          {weekActivity.map((day) => {
+            const missed = day.isPast && !day.active;
+            return (
+              <div key={day.date} className="flex flex-col items-center gap-1.5">
+                <span
+                  className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
+                    day.active
+                      ? "bg-rosa"
+                      : "border border-neutral-300 bg-neutral-100"
+                  } ${day.isFuture ? "opacity-40" : ""}`}
+                >
+                  {missed && <X size={13} strokeWidth={2.5} className="text-neutral-400" />}
+                </span>
+                <span className="text-[11px] text-neutral-500">{day.label}</span>
+              </div>
+            );
+          })}
         </div>
 
         <Link href="/archive" className="text-[13px] font-medium text-neutral-600">
@@ -103,7 +110,7 @@ export default async function Home() {
         </Link>
       </div>
 
-      <nav className="flex items-center justify-center gap-14 border-t border-neutral-100 pb-6 pt-3.5">
+      <nav className="flex items-center justify-center gap-16 border-t border-neutral-100 pb-6 pt-4">
         {[
           { label: "홈", href: "/", Icon: House, active: true },
           { label: "아카이브", href: "/archive", Icon: Library, active: false },
@@ -112,21 +119,15 @@ export default async function Home() {
           <Link
             key={tab.label}
             href={tab.href}
-            className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+            aria-label={tab.label}
+            className="flex items-center justify-center transition-transform active:scale-90"
           >
             <tab.Icon
               className={`transition-transform ${tab.active ? "scale-110" : ""}`}
-              size={22}
+              size={26}
               strokeWidth={tab.active ? 2.4 : 1.8}
               color={tab.active ? "var(--rosa)" : "#a3a3a3"}
             />
-            <span
-              className={`text-[11px] ${
-                tab.active ? "font-bold text-rosa" : "text-neutral-500"
-              }`}
-            >
-              {tab.label}
-            </span>
           </Link>
         ))}
       </nav>

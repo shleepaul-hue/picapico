@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Volume2 } from "lucide-react";
+import { Circle, Volume2, X as XIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
   buildBonusChoices,
@@ -185,7 +185,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
           <br />
           거꾸로도 기억하시나요?
         </h2>
-        <p className="animate-pop-in rounded-full bg-neutral-100 px-3.5 py-1.5 text-xs font-bold text-neutral-700">
+        <p className="animate-pop-in rounded-full bg-rosa-50 px-3.5 py-1.5 text-xs font-bold text-rosa-600">
           방금 퀴즈 {correctCount}/{questions.length}개 정답
         </p>
         <p className="text-[13px] text-neutral-500">
@@ -275,21 +275,30 @@ export default function StudySession({ destination, dDayLabel }: Props) {
               const isCorrectChoice = choice === current.phrase.korean;
               const isSelected = selected === choice;
               const showResult = selected !== null;
+              const isWrongSelected = showResult && isSelected && !isCorrectChoice;
               return (
                 <button
                   key={choice}
                   type="button"
                   onClick={() => setSelected(choice)}
                   disabled={selected !== null}
-                  className={`rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors ${
+                  className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors ${
                     showResult && isCorrectChoice
-                      ? "border-2 border-neutral-900"
-                      : showResult && isSelected
-                        ? "border-red-300 bg-red-50"
+                      ? "border-rosa-200 bg-rosa-50"
+                      : isWrongSelected
+                        ? "border-red-200 bg-red-50"
                         : "border-neutral-300"
-                  }`}
+                  } ${showResult && !isCorrectChoice && !isWrongSelected ? "text-neutral-400" : ""}`}
                 >
-                  {choice}
+                  <span>{choice}</span>
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+                    {showResult && isCorrectChoice && (
+                      <Circle size={17} strokeWidth={2.5} className="text-rosa-600" />
+                    )}
+                    {isWrongSelected && (
+                      <XIcon size={17} strokeWidth={2.5} className="text-red-500" />
+                    )}
+                  </span>
                 </button>
               );
             })}
@@ -323,21 +332,30 @@ export default function StudySession({ destination, dDayLabel }: Props) {
               const isCorrectChoice = choice === bonusCurrent.phrase.spanish;
               const isSelected = selected === choice;
               const showResult = selected !== null;
+              const isWrongSelected = showResult && isSelected && !isCorrectChoice;
               return (
                 <button
                   key={choice}
                   type="button"
                   onClick={() => setSelected(choice)}
                   disabled={selected !== null}
-                  className={`rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors ${
+                  className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors ${
                     showResult && isCorrectChoice
-                      ? "border-2 border-neutral-900"
-                      : showResult && isSelected
-                        ? "border-red-300 bg-red-50"
+                      ? "border-rosa-200 bg-rosa-50"
+                      : isWrongSelected
+                        ? "border-red-200 bg-red-50"
                         : "border-neutral-300"
-                  }`}
+                  } ${showResult && !isCorrectChoice && !isWrongSelected ? "text-neutral-400" : ""}`}
                 >
-                  {choice}
+                  <span>{choice}</span>
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+                    {showResult && isCorrectChoice && (
+                      <Circle size={17} strokeWidth={2.5} className="text-rosa-600" />
+                    )}
+                    {isWrongSelected && (
+                      <XIcon size={17} strokeWidth={2.5} className="text-red-500" />
+                    )}
+                  </span>
                 </button>
               );
             })}

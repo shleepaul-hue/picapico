@@ -38,7 +38,15 @@ export function computeStreak(sessionDates: string[], today: Date = new Date()):
   return streak;
 }
 
-export type WeekDay = { label: string; date: string; active: boolean; isFuture: boolean };
+export type WeekDay = {
+  label: string;
+  date: string;
+  active: boolean;
+  isFuture: boolean;
+  // Strictly before today — used to mark a day "missed" (X) rather than
+  // just empty, which today itself isn't yet since it can still be studied.
+  isPast: boolean;
+};
 
 // Mon..Sun of the current week, each flagged whether a session happened
 // that day (used for the home screen's 7 streak dots).
@@ -61,6 +69,7 @@ export function computeWeekActivity(
       date: dateStr,
       active: dateSet.has(dateStr),
       isFuture: d.getTime() > t.getTime(),
+      isPast: d.getTime() < t.getTime(),
     };
   });
 }

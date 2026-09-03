@@ -95,7 +95,8 @@ export default function OnboardingForm({
         </h1>
 
         <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-neutral-600">
+          <span className="flex items-center gap-2 text-sm font-medium text-neutral-600">
+            <span className="h-2 w-2 rounded-full bg-turquesa" />
             어디로 여행 가나요?
           </span>
           <input
@@ -108,7 +109,8 @@ export default function OnboardingForm({
         </label>
 
         <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-neutral-600">
+          <span className="flex items-center gap-2 text-sm font-medium text-neutral-600">
+            <span className="h-2 w-2 rounded-full bg-mango" />
             여행 날짜가 언제인가요?
           </span>
           <input
@@ -125,7 +127,8 @@ export default function OnboardingForm({
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-neutral-600">
+            <span className="flex items-center gap-2 text-sm font-medium text-neutral-600">
+              <span className="h-2 w-2 rounded-full bg-girasol" />
               아침 학습 알림을 받을까요?
             </span>
             <button

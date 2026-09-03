@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import AuthGateLoader from "@/components/AuthGateLoader";
+import SpanishGreetingRotator from "@/components/SpanishGreetingRotator";
 
 // Figma wireframe: "⓪-1 가입" (00_SignUp)
 // DB: on successful OAuth, the on_auth_user_created trigger (supabase/schema.sql)
@@ -17,16 +18,17 @@ export default async function SignUpPage() {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-between px-6 py-16">
       <div className="flex flex-col items-center gap-5">
-        <h1 className="text-2xl font-bold tracking-tight text-rosa-600">PICAPICO</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-rosa-600">PicaPico</h1>
 
-        <div className="animate-drop-in flex h-44 w-44 items-center justify-center">
+        <div className="relative flex h-44 w-44 items-center justify-center">
+          <SpanishGreetingRotator className="absolute -top-1 left-1/2 -translate-x-1/2" />
           <Image
             src="/bird-logo.png"
             alt="PicaPico 콜리브리 캐릭터"
             width={200}
             height={200}
             priority
-            className="h-auto w-[168px]"
+            className="animate-drop-in h-auto w-[168px]"
           />
         </div>
 

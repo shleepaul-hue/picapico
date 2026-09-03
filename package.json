@@ -16,7 +16,6 @@
     "lucide-react": "^1.39.0",
     "next": "16.3.3",
     "react": "19.2.8",
-    "react-activity-calendar": "^3.2.1",
     "react-dom": "19.2.8",
     "react-voice-visualizer": "^2.1.0"
   },

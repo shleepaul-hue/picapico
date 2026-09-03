@@ -76,17 +76,17 @@ export default async function CompletePage({
 
       <div className="grid w-full grid-cols-3 gap-3">
         {[
-          [`${phrases.length}개`, "새 표현", false],
-          [`${durationMinutes}분`, "학습 시간", false],
-          [`${streak}일`, "연속 학습", true],
-        ].map(([value, label, isStreak], i) => (
+          [`${phrases.length}개`, "새 표현", "bg-turquesa/30"],
+          [`${durationMinutes}분`, "학습 시간", "bg-mango/30"],
+          [`${streak}일`, "연속 학습", "bg-rosa-50"],
+        ].map(([value, label, tint], i) => (
           <div
-            key={label as string}
+            key={label}
             style={{ animationDelay: `${i * 70}ms` }}
-            className="animate-pop-in flex flex-col items-center gap-1 rounded-xl bg-neutral-100 py-4"
+            className={`animate-pop-in flex flex-col items-center gap-1 rounded-xl py-4 ${tint}`}
           >
             <span
-              className={`text-lg font-bold ${isStreak ? "text-rosa-600" : ""}`}
+              className={`text-lg font-bold ${tint === "bg-rosa-50" ? "text-rosa-600" : "text-ink"}`}
             >
               {value}
             </span>

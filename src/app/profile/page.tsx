@@ -35,19 +35,28 @@ export default async function ProfilePage() {
 
         <div className="flex flex-col gap-3 rounded-2xl border border-neutral-200 p-4 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-neutral-500">여행지</span>
-            <span className="font-medium">
+            <span className="flex items-center gap-2 text-neutral-500">
+              <span className="h-2 w-2 rounded-full bg-turquesa" />
+              여행지
+            </span>
+            <span className="font-bold text-rosa-600">
               {destinationFlag && <span aria-hidden>{destinationFlag} </span>}
               {profile?.destination ?? "미설정"}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-neutral-500">여행 날짜</span>
-            <span className="font-medium">{profile?.trip_date ?? "미설정"}</span>
+            <span className="flex items-center gap-2 text-neutral-500">
+              <span className="h-2 w-2 rounded-full bg-mango" />
+              여행 날짜
+            </span>
+            <span className="font-bold text-rosa-600">{profile?.trip_date ?? "미설정"}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-neutral-500">아침 알림</span>
-            <span className="font-medium">
+            <span className="flex items-center gap-2 text-neutral-500">
+              <span className="h-2 w-2 rounded-full bg-girasol" />
+              아침 알림
+            </span>
+            <span className="font-medium text-ink">
               {profile?.reminder_enabled
                 ? `${profile.reminder_time?.slice(0, 5) ?? "08:00"} 켜짐`
                 : "꺼짐"}
@@ -66,7 +75,7 @@ export default async function ProfilePage() {
       <div className="flex flex-col gap-4 pb-6">
         <SignOutButton />
 
-        <nav className="flex items-center justify-center gap-14 border-t border-neutral-100 pb-2 pt-3.5">
+        <nav className="flex items-center justify-center gap-16 border-t border-neutral-100 pb-2 pt-4">
           {[
             { label: "홈", href: "/", Icon: House, active: false },
             { label: "아카이브", href: "/archive", Icon: Library, active: false },
@@ -75,21 +84,15 @@ export default async function ProfilePage() {
             <Link
               key={tab.label}
               href={tab.href}
-              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+              aria-label={tab.label}
+              className="flex items-center justify-center transition-transform active:scale-90"
             >
               <tab.Icon
                 className={`transition-transform ${tab.active ? "scale-110" : ""}`}
-                size={22}
+                size={26}
                 strokeWidth={tab.active ? 2.4 : 1.8}
                 color={tab.active ? "var(--rosa)" : "#a3a3a3"}
               />
-              <span
-                className={`text-[11px] ${
-                  tab.active ? "font-bold text-rosa" : "text-neutral-500"
-                }`}
-              >
-                {tab.label}
-              </span>
             </Link>
           ))}
         </nav>

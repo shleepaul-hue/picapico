@@ -30,7 +30,7 @@ export default function BrandTransition({
         className="animate-gentle-pulse h-[64px] w-auto"
       />
 
-      <span className="text-xl font-bold tracking-tight text-rosa-600">PICAPICO</span>
+      <span className="text-xl font-bold tracking-tight text-rosa-600">PicaPico</span>
 
       <div className="h-1.5 w-40 overflow-hidden rounded-full bg-rosa-50">
         <div className="animate-loading-bar h-full w-2/5 rounded-full bg-rosa" />
@@ -42,7 +42,7 @@ export default function BrandTransition({
         <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-3.5 py-2 text-xs font-medium text-neutral-600">
           {destinationFlag && <span aria-hidden>{destinationFlag}</span>}
           <span>{destination} 여행까지</span>
-          <span className="font-bold text-ink">{dDayLabel}</span>
+          <span className="font-bold text-rosa-600">{dDayLabel}</span>
         </div>
       )}
     </main>

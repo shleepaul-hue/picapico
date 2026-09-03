@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ActivityCalendar } from "react-activity-calendar";
 import { House, Library, Star, UserSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { computeStreak } from "@/lib/streak";
 import ArchiveTabs, { type ArchiveTab } from "@/components/ArchiveTabs";
 
 const CATEGORY_TABS = ["스몰토크", "인사"] as const;
@@ -87,60 +87,48 @@ export default async function ArchivePage({
         ? allSessions.filter((s) => sessionHasFavorite(s.id))
         : allSessions.filter((s) => s.category === activeTab);
 
-  // Heatmap needs a value for every day in a contiguous range — fill in the
-  // last ~5 weeks so react-activity-calendar always has a full grid, even
-  // before any sessions exist.
-  const heatmapDays = 35;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const sessionDateSet = new Set(allSessions.map((s) => s.session_date));
-  const heatmapData = Array.from({ length: heatmapDays }).map((_, i) => {
-    const d = new Date(
-      today.getTime() - (heatmapDays - 1 - i) * 24 * 60 * 60 * 1000,
-    );
-    const dateStr = d.toISOString().slice(0, 10);
-    const hasSession = sessionDateSet.has(dateStr);
-    return {
-      date: dateStr,
-      count: hasSession ? 1 : 0,
-      level: hasSession ? 4 : 0,
-    };
-  });
+
+  // Text-based monthly stat instead of the old heatmap widget — how many of
+  // this month's days have a session, plus the running streak.
+  const monthPrefix = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  const studiedThisMonth = new Set(
+    allSessions
+      .map((s) => s.session_date)
+      .filter((d) => d.startsWith(monthPrefix)),
+  ).size;
+  const streak = computeStreak(allSessions.map((s) => s.session_date));
 
   const weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-between px-5 py-6">
       <div className="flex flex-col gap-5">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-ink">아카이브</h1>
-          <span className="h-6 w-6 rounded-full border border-neutral-400" />
-        </div>
+        <h1 className="text-xl font-bold text-ink">아카이브</h1>
 
         <ArchiveTabs tabs={tabs} activeTab={activeTab} />
 
-        <div className="rounded-2xl bg-neutral-100 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-medium text-neutral-600">
-              최근 5주 학습 현황
-            </p>
-            <span className="text-[11px] font-medium text-neutral-400">
-              총 {allSessions.length}회 학습
-            </span>
+        <div className="rounded-3xl bg-gradient-to-br from-rosa-50 via-white to-arena p-[3px]">
+          <div className="flex items-stretch overflow-hidden rounded-[21px] bg-white">
+            <div className="flex flex-1 flex-col items-center gap-0.5 py-5">
+              <span className="text-[26px] font-extrabold leading-none text-rosa-600">
+                {studiedThisMonth}
+                <span className="text-sm font-bold text-neutral-400">/{daysInMonth}일</span>
+              </span>
+              <span className="text-[11px] font-medium text-neutral-500">
+                {today.getMonth() + 1}월 학습일
+              </span>
+            </div>
+            <div className="w-px bg-neutral-100" />
+            <div className="flex flex-1 flex-col items-center gap-0.5 py-5">
+              <span className="text-[26px] font-extrabold leading-none text-rosa-600">
+                🔥 {streak}
+              </span>
+              <span className="text-[11px] font-medium text-neutral-500">일 연속</span>
+            </div>
           </div>
-          <ActivityCalendar
-            data={heatmapData}
-            showColorLegend={false}
-            showMonthLabels={false}
-            showTotalCount={false}
-            showWeekdayLabels={false}
-            blockSize={12}
-            blockMargin={4}
-            theme={{
-              light: ["#ebebeb", "#262626"],
-              dark: ["#ebebeb", "#262626"],
-            }}
-          />
         </div>
 
         <div className="flex flex-col gap-2.5">
@@ -180,12 +168,16 @@ export default async function ArchivePage({
                     weekdayLabels[d.getUTCDay()]
                   })`;
             const firstPhrase = phrases[0];
+            const categoryColor =
+              s.category === "인사"
+                ? "bg-mango/40 text-amber-800"
+                : "bg-turquesa/40 text-teal-800";
 
             return (
               <div
                 key={s.id}
-                className={`flex flex-col gap-1.5 rounded-2xl border border-l-[3px] bg-white px-4 py-3.5 ${
-                  isToday ? "border-neutral-100 border-l-rosa" : "border-neutral-100 border-l-neutral-200"
+                className={`flex flex-col gap-1.5 rounded-2xl border-l-4 px-4 py-3.5 ${
+                  isToday ? "border-l-rosa bg-rosa-50/50" : "border-l-neutral-200 bg-neutral-50"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -195,7 +187,7 @@ export default async function ArchivePage({
                       <Star size={12} className="fill-rosa text-rosa" strokeWidth={0} />
                     )}
                   </span>
-                  <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-medium text-neutral-500">
+                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${categoryColor}`}>
                     {s.category ?? "스몰토크"} · {phrases.length}개
                   </span>
                 </div>
@@ -220,7 +212,7 @@ export default async function ArchivePage({
         </div>
       </div>
 
-      <nav className="flex items-center justify-center gap-14 border-t border-neutral-100 pb-6 pt-3.5">
+      <nav className="flex items-center justify-center gap-16 border-t border-neutral-100 pb-6 pt-4">
         {[
           { label: "홈", href: "/", Icon: House, active: false },
           { label: "아카이브", href: "/archive", Icon: Library, active: true },
@@ -229,21 +221,15 @@ export default async function ArchivePage({
           <Link
             key={tab.label}
             href={tab.href}
-            className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+            aria-label={tab.label}
+            className="flex items-center justify-center transition-transform active:scale-90"
           >
             <tab.Icon
               className={`transition-transform ${tab.active ? "scale-110" : ""}`}
-              size={22}
+              size={26}
               strokeWidth={tab.active ? 2.4 : 1.8}
               color={tab.active ? "var(--rosa)" : "#a3a3a3"}
             />
-            <span
-              className={`text-[11px] ${
-                tab.active ? "font-bold text-rosa" : "text-neutral-500"
-              }`}
-            >
-              {tab.label}
-            </span>
           </Link>
         ))}
       </nav>
