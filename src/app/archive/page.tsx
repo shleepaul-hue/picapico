@@ -182,23 +182,25 @@ export default async function ArchivePage() {
 
       <nav className="flex items-center justify-between border-t border-neutral-100 pb-6 pt-3.5">
         {[
-          { label: "홈", href: "/", active: false },
-          { label: "아카이브", href: "/archive", active: true },
-          { label: "프로필", href: "/profile", active: false },
+          { label: "홈", href: "/", icon: "🏠", active: false },
+          { label: "아카이브", href: "/archive", icon: "📚", active: true },
+          { label: "프로필", href: "/profile", icon: "👤", active: false },
         ].map((tab) => (
           <Link
             key={tab.label}
             href={tab.href}
-            className="flex flex-col items-center gap-1"
+            className="flex flex-col items-center gap-1 transition-transform active:scale-90"
           >
             <span
-              className={`h-5 w-5 rounded-full ${
-                tab.active ? "bg-neutral-900" : "bg-neutral-300"
+              className={`text-lg leading-none transition-all ${
+                tab.active ? "scale-110" : "opacity-45 grayscale"
               }`}
-            />
+            >
+              {tab.icon}
+            </span>
             <span
               className={`text-[11px] ${
-                tab.active ? "font-bold text-neutral-900" : "text-neutral-500"
+                tab.active ? "font-bold text-rosa" : "text-neutral-500"
               }`}
             >
               {tab.label}

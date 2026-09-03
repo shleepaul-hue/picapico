@@ -3,6 +3,24 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Rosa Mexicano — the signature brand accent. Replaces amber-* for true
+     brand/celebratory moments (bonus round, streaks, active nav state).
+     amber-* itself stays put where it's a functional/semantic color
+     (warning banners, mid-score indicators) — see globals migration notes
+     in picapico-design-system.html. */
+  --rosa: #e4007c;
+  --rosa-600: #b80065;
+  --rosa-200: #f6b8d9;
+  --rosa-50: #fde6f1;
+
+  /* Supporting pastel palette — Latin-America-inspired, used for lighter
+     accents (category chips, nav icon tints, illustration fills). */
+  --turquesa: #9fe0d8;
+  --mango: #fbc48b;
+  --girasol: #f7e28c;
+  --cactus: #b9ddb0;
+  --arena: #f3e7d6;
 }
 
 @theme inline {
@@ -10,6 +28,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-rosa: var(--rosa);
+  --color-rosa-600: var(--rosa-600);
+  --color-rosa-200: var(--rosa-200);
+  --color-rosa-50: var(--rosa-50);
+  --color-turquesa: var(--turquesa);
+  --color-mango: var(--mango);
+  --color-girasol: var(--girasol);
+  --color-cactus: var(--cactus);
+  --color-arena: var(--arena);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +51,59 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Motion primitives — small, purposeful, and easy to reuse. Each one is a
+   single utility class so components can opt in without hand-rolling
+   keyframes. All of them collapse to no animation under reduced-motion. */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gentle-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-fade-slide-up {
+  animation: fade-slide-up 0.4s ease-out both;
+}
+
+.animate-gentle-pulse {
+  animation: gentle-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop-in,
+  .animate-fade-slide-up,
+  .animate-gentle-pulse {
+    animation: none;
+  }
 }

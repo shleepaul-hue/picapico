@@ -15,11 +15,13 @@ export default function BrandTransition({
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-center gap-5 px-5 py-6">
       <div className="flex flex-col items-center gap-2">
-        <span className="text-2xl font-bold tracking-tight">PicaPico</span>
+        <span className="animate-gentle-pulse text-2xl font-bold tracking-tight">
+          PicaPico
+        </span>
         <span className="flex gap-1.5">
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-neutral-900 [animation-delay:-0.3s]" />
+          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-rosa [animation-delay:-0.3s]" />
           <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-neutral-900 [animation-delay:-0.15s]" />
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-neutral-900" />
+          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-rosa" />
         </span>
       </div>
 

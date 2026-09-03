@@ -35,8 +35,14 @@ export default async function Home() {
       <div className="flex flex-1 flex-col items-center gap-5">
         <div className="flex w-full items-center justify-between">
           <h1 className="text-xl font-bold">PicaPico</h1>
-          <span className="rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-600">
-            {streak > 0 ? `${streak}일 연속 공부 중` : "오늘부터 시작해봐요"}
+          <span
+            className={`rounded-full px-3 py-1.5 text-xs font-medium ${
+              streak > 0
+                ? "bg-rosa-50 text-rosa-600"
+                : "bg-neutral-100 text-neutral-600"
+            }`}
+          >
+            {streak > 0 ? `🔥 ${streak}일 연속 공부 중` : "오늘부터 시작해봐요"}
           </span>
         </div>
 
@@ -62,7 +68,7 @@ export default async function Home() {
 
         <Link
           href="/session"
-          className="w-full rounded-2xl bg-neutral-900 py-4 text-center font-bold text-white"
+          className="w-full rounded-2xl bg-neutral-900 py-4 text-center font-bold text-white transition-transform active:scale-95"
         >
           오늘의 학습 시작 (20분)
         </Link>
@@ -71,9 +77,9 @@ export default async function Home() {
           {weekActivity.map((day) => (
             <div key={day.date} className="flex flex-col items-center gap-1.5">
               <span
-                className={`h-7 w-7 rounded-full ${
+                className={`h-7 w-7 rounded-full transition-colors ${
                   day.active
-                    ? "bg-neutral-900"
+                    ? "bg-rosa"
                     : "border border-neutral-300 bg-neutral-100"
                 } ${day.isFuture ? "opacity-40" : ""}`}
               />
@@ -89,23 +95,25 @@ export default async function Home() {
 
       <nav className="flex items-center justify-between border-t border-neutral-100 pb-6 pt-3.5">
         {[
-          { label: "홈", href: "/", active: true },
-          { label: "아카이브", href: "/archive", active: false },
-          { label: "프로필", href: "/profile", active: false },
+          { label: "홈", href: "/", icon: "🏠", active: true },
+          { label: "아카이브", href: "/archive", icon: "📚", active: false },
+          { label: "프로필", href: "/profile", icon: "👤", active: false },
         ].map((tab) => (
           <Link
             key={tab.label}
             href={tab.href}
-            className="flex flex-col items-center gap-1"
+            className="flex flex-col items-center gap-1 transition-transform active:scale-90"
           >
             <span
-              className={`h-5 w-5 rounded-full ${
-                tab.active ? "bg-neutral-900" : "bg-neutral-300"
+              className={`text-lg leading-none transition-all ${
+                tab.active ? "scale-110" : "opacity-45 grayscale"
               }`}
-            />
+            >
+              {tab.icon}
+            </span>
             <span
               className={`text-[11px] ${
-                tab.active ? "font-bold text-neutral-900" : "text-neutral-500"
+                tab.active ? "font-bold text-rosa" : "text-neutral-500"
               }`}
             >
               {tab.label}

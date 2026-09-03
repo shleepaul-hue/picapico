@@ -184,7 +184,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
           <br />
           거꾸로도 기억하시나요?
         </h2>
-        <p className="rounded-full bg-neutral-100 px-3.5 py-1.5 text-xs font-bold text-neutral-700">
+        <p className="animate-pop-in rounded-full bg-neutral-100 px-3.5 py-1.5 text-xs font-bold text-neutral-700">
           방금 퀴즈 {correctCount}/{questions.length}개 정답
         </p>
         <p className="text-[13px] text-neutral-500">
@@ -195,7 +195,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
         <button
           type="button"
           onClick={() => setPhase("bonus")}
-          className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white"
+          className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform active:scale-95"
         >
           응용문제 시작하기 (5문제)
         </button>
@@ -217,10 +217,10 @@ export default function StudySession({ destination, dDayLabel }: Props) {
           {(phase === "bonus" ? bonusQuestions : questions).map((q, i) => (
             <span
               key={`${phase === "bonus" ? "b" : "m"}-${q.phrase.spanish}`}
-              className={`h-1.5 flex-1 rounded-full ${
+              className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
                 i <= index
                   ? phase === "bonus"
-                    ? "bg-amber-500"
+                    ? "bg-rosa"
                     : "bg-neutral-900"
                   : "bg-neutral-100"
               }`}
@@ -255,7 +255,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
             type="button"
             onClick={goToQuiz}
             disabled={!attemptedPronunciation}
-            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white disabled:bg-neutral-100 disabled:text-neutral-400"
+            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
           >
             퀴즈 풀어보기 →
           </button>
@@ -301,7 +301,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
             type="button"
             onClick={handleNext}
             disabled={selected === null}
-            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white disabled:bg-neutral-100 disabled:text-neutral-400"
+            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
           >
             {isLast ? "응용문제로 →" : "다음"}
           </button>
@@ -310,8 +310,8 @@ export default function StudySession({ destination, dDayLabel }: Props) {
 
       {phase === "bonus" && (
         <>
-          <div className="flex flex-col items-center gap-4 rounded-2xl border border-amber-200 bg-amber-50/40 px-5 py-7">
-            <p className="text-xs font-bold text-amber-600">
+          <div className="flex flex-col items-center gap-4 rounded-2xl border border-rosa-200 bg-rosa-50/40 px-5 py-7">
+            <p className="text-xs font-bold text-rosa-600">
               응용문제 {index + 1}/{bonusQuestions.length}
             </p>
             <p className="text-2xl font-bold">&ldquo;{bonusCurrent.phrase.korean}&rdquo;</p>
@@ -351,7 +351,7 @@ export default function StudySession({ destination, dDayLabel }: Props) {
             type="button"
             onClick={handleBonusNext}
             disabled={selected === null}
-            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white disabled:bg-neutral-100 disabled:text-neutral-400"
+            className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform disabled:bg-neutral-100 disabled:text-neutral-400 active:enabled:scale-95"
           >
             {isBonusLast ? "완료" : "다음"}
           </button>
