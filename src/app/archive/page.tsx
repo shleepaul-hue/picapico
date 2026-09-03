@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ActivityCalendar } from "react-activity-calendar";
-import { Home, BookOpen, User } from "lucide-react";
+import { House, Library, UserSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 // Figma wireframe: "④ 아카이브" (04_Archive)
@@ -183,9 +183,9 @@ export default async function ArchivePage() {
 
       <nav className="flex items-center justify-between border-t border-neutral-100 pb-6 pt-3.5">
         {[
-          { label: "홈", href: "/", Icon: Home, active: false },
-          { label: "아카이브", href: "/archive", Icon: BookOpen, active: true },
-          { label: "프로필", href: "/profile", Icon: User, active: false },
+          { label: "홈", href: "/", Icon: House, active: false },
+          { label: "아카이브", href: "/archive", Icon: Library, active: true },
+          { label: "프로필", href: "/profile", Icon: UserSquare, active: false },
         ].map((tab) => (
           <Link
             key={tab.label}

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Home as HomeIcon, BookOpen, User } from "lucide-react";
+import { House, Library, UserSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { computeStreak, computeWeekActivity } from "@/lib/streak";
 import { computeDDayLabel } from "@/lib/tripCountdown";
@@ -96,9 +96,9 @@ export default async function Home() {
 
       <nav className="flex items-center justify-between border-t border-neutral-100 pb-6 pt-3.5">
         {[
-          { label: "홈", href: "/", Icon: HomeIcon, active: true },
-          { label: "아카이브", href: "/archive", Icon: BookOpen, active: false },
-          { label: "프로필", href: "/profile", Icon: User, active: false },
+          { label: "홈", href: "/", Icon: House, active: true },
+          { label: "아카이브", href: "/archive", Icon: Library, active: false },
+          { label: "프로필", href: "/profile", Icon: UserSquare, active: false },
         ].map((tab) => (
           <Link
             key={tab.label}

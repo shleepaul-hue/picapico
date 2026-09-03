@@ -17,11 +17,11 @@ export default async function SignUpPage() {
       <div className="flex flex-col items-center gap-5">
         <h1 className="text-2xl font-bold">PicaPico</h1>
 
-        <div className="flex h-40 w-40 items-center justify-center rounded-full border border-dashed border-neutral-300 bg-neutral-100 text-center text-xs font-medium text-neutral-500">
+        <div className="flex h-40 w-40 items-center justify-center rounded-full border border-dashed border-rosa-200 bg-rosa-50/40 text-center text-xs font-medium text-neutral-500 animate-gentle-pulse">
           [콜리브리 인사 모션]
         </div>
 
-        <h2 className="text-center text-lg font-bold leading-snug">
+        <h2 className="animate-fade-slide-up text-center text-lg font-bold leading-snug">
           여행 스몰토크,
           <br />
           하루 20분으로 시작해요
@@ -37,7 +37,7 @@ export default async function SignUpPage() {
           <span className="h-px flex-1 bg-neutral-300" />
         </div>
 
-        <button className="text-center text-sm font-medium text-neutral-600">
+        <button className="text-center text-sm font-medium text-neutral-600 transition-transform active:scale-95">
           이메일로 계속하기
         </button>
 

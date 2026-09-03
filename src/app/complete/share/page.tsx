@@ -26,7 +26,7 @@ export default function ShareCardPage() {
         <Link
           href="/complete"
           aria-label="뒤로"
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 text-xs font-bold text-neutral-600"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 text-xs font-bold text-neutral-600 transition-transform active:scale-90"
         >
           ←
         </Link>
@@ -44,13 +44,13 @@ export default function ShareCardPage() {
         </div>
 
         <div className="flex flex-col items-center gap-5">
-          <div className="flex h-[160px] w-[160px] items-center justify-center rounded-full border border-dashed border-neutral-400 bg-white text-center text-xs font-medium text-neutral-500">
+          <div className="flex h-[160px] w-[160px] items-center justify-center rounded-full border border-dashed border-rosa-200 bg-white text-center text-xs font-medium text-neutral-500">
             [콜리브리 캐릭터 일러스트]
           </div>
 
           <div className="flex flex-col items-center gap-2.5">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-rosa" />
               <span className="text-lg font-bold">5일 연속</span>
               <span className="text-neutral-400">→</span>
               <span className="text-[15px] font-medium text-neutral-600">
@@ -72,7 +72,7 @@ export default function ShareCardPage() {
 
       <button
         onClick={handleDownload}
-        className="w-full max-w-[320px] rounded-2xl bg-neutral-900 py-4 font-bold text-white"
+        className="w-full max-w-[320px] rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform active:scale-95"
       >
         이미지로 저장
       </button>

@@ -50,26 +50,33 @@ export default async function CompletePage({
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center gap-6 px-5 pb-8 pt-12">
-      <div className="flex h-40 w-[200px] items-center justify-center rounded-full border border-dashed border-neutral-300 bg-neutral-100 text-center text-xs font-medium text-neutral-500">
+      <div className="animate-pop-in flex h-40 w-[200px] items-center justify-center rounded-full border border-dashed border-rosa-200 bg-rosa-50/40 text-center text-xs font-medium text-neutral-500">
         [콜리브리 축하 모션]
       </div>
 
-      <h1 className="text-center text-xl font-bold">오늘의 학습 완료!</h1>
-      <p className="text-center text-[13px] text-neutral-500">
+      <h1 className="animate-fade-slide-up text-center text-xl font-bold">
+        오늘의 학습 완료!
+      </h1>
+      <p className="animate-fade-slide-up text-center text-[13px] text-neutral-500">
         {streak}일 연속 학습 중이에요 — 이대로만 가면 발리에서 술술!
       </p>
 
       <div className="grid w-full grid-cols-3 gap-3">
         {[
-          [`${phrases.length}개`, "새 표현"],
-          [`${durationMinutes}분`, "학습 시간"],
-          [`${streak}일`, "연속 학습"],
-        ].map(([value, label]) => (
+          [`${phrases.length}개`, "새 표현", false],
+          [`${durationMinutes}분`, "학습 시간", false],
+          [`${streak}일`, "연속 학습", true],
+        ].map(([value, label, isStreak], i) => (
           <div
-            key={label}
-            className="flex flex-col items-center gap-1 rounded-xl bg-neutral-100 py-4"
+            key={label as string}
+            style={{ animationDelay: `${i * 70}ms` }}
+            className="animate-pop-in flex flex-col items-center gap-1 rounded-xl bg-neutral-100 py-4"
           >
-            <span className="text-lg font-bold">{value}</span>
+            <span
+              className={`text-lg font-bold ${isStreak ? "text-rosa-600" : ""}`}
+            >
+              {value}
+            </span>
             <span className="text-[11px] text-neutral-500">{label}</span>
           </div>
         ))}
@@ -96,19 +103,19 @@ export default async function CompletePage({
       <div className="flex w-full flex-col gap-2.5">
         <Link
           href="/"
-          className="w-full rounded-2xl bg-neutral-900 py-4 text-center font-bold text-white"
+          className="w-full rounded-2xl bg-neutral-900 py-4 text-center font-bold text-white transition-transform active:scale-95"
         >
           홈으로
         </Link>
         <Link
           href="/complete/share"
-          className="w-full rounded-2xl border border-neutral-300 py-4 text-center font-bold"
+          className="w-full rounded-2xl border border-neutral-300 py-4 text-center font-bold transition-transform active:scale-95"
         >
           인스타 스토리로 공유하기
         </Link>
         <Link
           href="/archive"
-          className="py-1 text-center text-[13px] font-medium text-neutral-500"
+          className="py-1 text-center text-[13px] font-medium text-neutral-500 transition-transform active:scale-95"
         >
           아카이브에서 보기
         </Link>

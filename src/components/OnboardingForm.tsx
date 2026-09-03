@@ -85,7 +85,7 @@ export default function OnboardingForm({
         ) : (
           <div className="flex gap-1.5">
             <span className="h-1 w-6 rounded-full bg-neutral-200" />
-            <span className="h-1 w-6 rounded-full bg-neutral-900" />
+            <span className="h-1 w-6 rounded-full bg-rosa" />
           </div>
         )}
 
@@ -133,7 +133,7 @@ export default function OnboardingForm({
               aria-checked={reminderEnabled}
               onClick={() => setReminderEnabled((v) => !v)}
               className={`relative h-[22px] w-10 rounded-full transition-colors ${
-                reminderEnabled ? "bg-neutral-900" : "bg-neutral-300"
+                reminderEnabled ? "bg-rosa" : "bg-neutral-300"
               }`}
             >
               <span
@@ -163,7 +163,7 @@ export default function OnboardingForm({
         type="button"
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white disabled:opacity-40"
+        className="w-full rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-transform active:enabled:scale-95 disabled:opacity-40"
       >
         {saving ? "저장 중..." : isEditing ? "저장하기" : "시작하기"}
       </button>

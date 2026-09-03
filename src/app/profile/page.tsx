@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Home, BookOpen, User } from "lucide-react";
+import { House, Library, UserSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/SignOutButton";
 
@@ -63,9 +63,9 @@ export default async function ProfilePage() {
 
         <nav className="flex items-center justify-between border-t border-neutral-100 pb-2 pt-3.5">
           {[
-            { label: "홈", href: "/", Icon: Home, active: false },
-            { label: "아카이브", href: "/archive", Icon: BookOpen, active: false },
-            { label: "프로필", href: "/profile", Icon: User, active: true },
+            { label: "홈", href: "/", Icon: House, active: false },
+            { label: "아카이브", href: "/archive", Icon: Library, active: false },
+            { label: "프로필", href: "/profile", Icon: UserSquare, active: true },
           ].map((tab) => (
             <Link
               key={tab.label}
