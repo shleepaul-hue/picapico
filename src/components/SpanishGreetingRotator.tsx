@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-// A rotating scrap of spoken Spanish, greeting-flavored, that "flips" in 3D
-// (perspective + rotateX) like a little card turning over — pure CSS, no
-// animation library, no shadows. Sits next to the bird character on the
-// Home and landing screens so the mascot always feels like it's "saying"
-// something different, in the language the app teaches.
+// A rotating scrap of spoken Spanish, greeting-flavored, in a cute little
+// speech bubble next to the bird character on the Home and signup screens —
+// so the mascot always feels like it's "saying" something different, in the
+// language the app teaches. Each new phrase rises up into place (reusing the
+// existing fade-slide-up motion primitive) rather than flipping/rotating.
 const GREETINGS = [
   "¡Hola!",
   "¿Qué tal?",
@@ -29,32 +29,27 @@ type Props = {
 
 export default function SpanishGreetingRotator({ className = "" }: Props) {
   const [greeting, setGreeting] = useState(GREETINGS[0]);
-  const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setFlipped(true);
-      const swap = setTimeout(() => {
-        setGreeting((current) => pickNext(current));
-        setFlipped(false);
-      }, 220);
-      return () => clearTimeout(swap);
+      setGreeting((current) => pickNext(current));
     }, 2600);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className={`flex flex-col items-center ${className}`} style={{ perspective: "500px" }}>
-      <span
-        className="inline-block rounded-2xl bg-white px-3.5 py-1.5 text-[13px] font-bold text-rosa-600 transition-transform duration-200 ease-in"
-        style={{
-          transform: flipped ? "rotateX(90deg)" : "rotateX(0deg)",
-          transformStyle: "preserve-3d",
-        }}
-      >
-        {greeting}
-      </span>
-      <span className="-mt-[3px] h-2 w-2 rotate-45 bg-white" />
+    <div className={`flex flex-col items-center ${className}`}>
+      <div className="overflow-hidden rounded-full border border-rosa-100 bg-white px-4 py-1.5">
+        {/* key={greeting} remounts the span on every swap, replaying the
+           rise-up animation each time instead of only on first paint. */}
+        <span
+          key={greeting}
+          className="animate-fade-slide-up inline-block text-[13px] font-bold text-rosa-600"
+        >
+          {greeting}
+        </span>
+      </div>
+      <span className="-mt-[3px] h-2 w-2 rotate-45 border-b border-r border-rosa-100 bg-white" />
     </div>
   );
 }
