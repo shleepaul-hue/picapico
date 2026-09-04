@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { House, Library, UserSquare, X } from "lucide-react";
+import { X } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { computeStreak, computeWeekActivity } from "@/lib/streak";
 import { computeDDayLabel } from "@/lib/tripCountdown";
 import { getDestinationFlag } from "@/lib/destinationFlag";
 import SpanishGreetingRotator from "@/components/SpanishGreetingRotator";
+import BottomNav, { NAV_CLEARANCE_CLASS } from "@/components/BottomNav";
 
 // Figma wireframe: "① 홈" (01_Home)
 // DB reads: profiles.destination/trip_date (countdown banner),
@@ -36,7 +37,9 @@ export default async function Home() {
   const weekActivity = computeWeekActivity(sessionDates);
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-between px-5 pt-6">
+    <main
+      className={`mx-auto flex min-h-dvh w-full max-w-sm flex-col px-5 pt-6 ${NAV_CLEARANCE_CLASS}`}
+    >
       <div className="flex flex-1 flex-col items-center gap-5">
         <div className="flex w-full items-center justify-between">
           <h1 className="text-xl font-bold">PicaPico</h1>
@@ -110,27 +113,7 @@ export default async function Home() {
         </Link>
       </div>
 
-      <nav className="flex items-center justify-center gap-16 border-t border-neutral-100 pb-6 pt-4">
-        {[
-          { label: "홈", href: "/", Icon: House, active: true },
-          { label: "아카이브", href: "/archive", Icon: Library, active: false },
-          { label: "프로필", href: "/profile", Icon: UserSquare, active: false },
-        ].map((tab) => (
-          <Link
-            key={tab.label}
-            href={tab.href}
-            aria-label={tab.label}
-            className="flex items-center justify-center transition-transform active:scale-90"
-          >
-            <tab.Icon
-              className={`transition-transform ${tab.active ? "scale-110" : ""}`}
-              size={26}
-              strokeWidth={tab.active ? 2.4 : 1.8}
-              color={tab.active ? "var(--rosa)" : "#a3a3a3"}
-            />
-          </Link>
-        ))}
-      </nav>
+      <BottomNav active="home" />
     </main>
   );
 }

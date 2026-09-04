@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { House, Library, Star, UserSquare } from "lucide-react";
+import { Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { computeStreak } from "@/lib/streak";
 import ArchiveTabs, { type ArchiveTab } from "@/components/ArchiveTabs";
+import BottomNav, { NAV_CLEARANCE_CLASS } from "@/components/BottomNav";
 
 const CATEGORY_TABS = ["스몰토크", "인사"] as const;
 
@@ -104,7 +104,9 @@ export default async function ArchivePage({
   const weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-between px-5 py-6">
+    <main
+      className={`mx-auto flex min-h-dvh w-full max-w-sm flex-col px-5 pt-6 ${NAV_CLEARANCE_CLASS}`}
+    >
       <div className="flex flex-col gap-5">
         <h1 className="text-xl font-bold text-ink">아카이브</h1>
 
@@ -212,27 +214,7 @@ export default async function ArchivePage({
         </div>
       </div>
 
-      <nav className="flex items-center justify-center gap-16 border-t border-neutral-100 pb-6 pt-4">
-        {[
-          { label: "홈", href: "/", Icon: House, active: false },
-          { label: "아카이브", href: "/archive", Icon: Library, active: true },
-          { label: "프로필", href: "/profile", Icon: UserSquare, active: false },
-        ].map((tab) => (
-          <Link
-            key={tab.label}
-            href={tab.href}
-            aria-label={tab.label}
-            className="flex items-center justify-center transition-transform active:scale-90"
-          >
-            <tab.Icon
-              className={`transition-transform ${tab.active ? "scale-110" : ""}`}
-              size={26}
-              strokeWidth={tab.active ? 2.4 : 1.8}
-              color={tab.active ? "var(--rosa)" : "#a3a3a3"}
-            />
-          </Link>
-        ))}
-      </nav>
+      <BottomNav active="archive" />
     </main>
   );
 }
